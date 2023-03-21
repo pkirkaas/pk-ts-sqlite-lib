@@ -1,0 +1,33 @@
+{
+  "extends":"pk-ts-common-lib/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "declaration": true,
+    "lib" : ["ESNext","ES5", "ES7", "ES6"],
+    "moduleResolution": "Node",
+    "target":"ESNext",
+    "module": "ESNext"
+
+  },
+  "include": [
+    "./src/**/*",
+  ],
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ],
+
+    "esm":true,
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "dist/**/*",
+    "*.d.ts"
+  ],
+   "typeRoots": [
+      "node_modules/@types",
+  ]
+}

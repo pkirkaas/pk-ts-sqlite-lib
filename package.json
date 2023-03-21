@@ -1,0 +1,37 @@
+{
+  "name": "pk-ts-sqlite-lib",
+  "version": "l.0.1",
+  "author": "Paul Kirkaas",
+  "license": "UNLICENSED",
+  "description": "TS/JS Utilities for node apps, including common JS functions",
+  "main": "dist/index",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./tst-exports": {
+      "types": "./dist/tst-exports.d.ts",
+      "import": "./dist/tst-exports.js",
+      "default": "./dist/tst-exports.js",
+      "require": "./dist/tst-exports.js"
+    },
+    "./tsconfig.json": "./tsconfig.json"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">= 18.0.0"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./node_modules package-lock.json"
+  },
+  "dependencies": {
+    "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
+    "sqlite":"*",
+    "sqlite3":"*",
+    "@types/sqlite3": "*"
+  }
+}
