@@ -2,5 +2,5 @@
  * Just for TS-Node...
  */
 {
-  "extends": "pk-ts-common-lib/tsconfig.json",
+  "extends": "pk-ts-node-lib/tsconfig.json",
 }
