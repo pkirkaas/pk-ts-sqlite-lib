@@ -1,0 +1,44 @@
+/**
+ * Just for TS-Node...
+ */
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "resolvePackageJsonImports": true,
+    "lib": [
+      "es6",
+      "esnext",
+      "dom"
+    ],
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "declaration": true,
+    "module":"es6",
+    "declarationMap": true,
+    "strict": false,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "checkJs": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowUmdGlobalAccess": true,
+    "allowJs": true,
+    "newLine": "lf",
+    "moduleResolution": "nodenext",
+  },
+  "include": [
+    "./src/**/*",
+  ],
+  "typeRoots": [
+    "node_modules/@types",
+  ],
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ],
+    "esm": true
+  },
+}
