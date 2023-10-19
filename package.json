@@ -14,8 +14,6 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
-    "./tsconfig.common.json": "./tsconfig.common.json",
-    "./tsconfig.esm.json": "./tsconfig.esm.json",
     "./tsconfig.cjs.json": "./tsconfig.cjs.json",
     "./tsconfig.json": "./tsconfig.json"
   },
@@ -23,8 +21,8 @@
     "node": ">= 18.0.0"
   },
   "scripts": {
-    "build": "tsc -p ./tsconfig.esm.json && tsc -p ./tsconfig.cjs.json",
-    "clean": "rm -rf ./dist ./node_modules package-lock.json"
+    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.cjs.json",
+    "clean": "rm -rf ./dist ./node_modules package-lock.json && npm i"
   },
   "dependencies": {
     "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",

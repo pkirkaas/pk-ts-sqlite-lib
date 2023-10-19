@@ -1,3 +1,0 @@
-{
-  "extends":"pk-ts-node-lib/tsconfig.common.json",
-}
