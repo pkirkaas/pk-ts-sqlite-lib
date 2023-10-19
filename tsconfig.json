@@ -6,8 +6,6 @@
   "compilerOptions": {
     "outDir": "./dist/esm",
     "baseUrl": "./",
-    "target":"es6",
-    "module": "ESNext"
   },
   "include": [
     "./src/**/*",
