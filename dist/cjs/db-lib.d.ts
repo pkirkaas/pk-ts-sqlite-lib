@@ -1,5 +1,5 @@
 /**
- * SQLite implementation for Signifly Case Assignment for Paul Kirkaas
+ * SQLite implementation
  * Paul Kirkaas, March 2023
  */
 /// <reference types="./vendor-typings/sqlite3" />

@@ -1,6 +1,6 @@
 "use strict";
 /**
- * SQLite implementation for Signifly Case Assignment for Paul Kirkaas
+ * SQLite implementation
  * Paul Kirkaas, March 2023
  */
 var __importDefault = (this && this.__importDefault) || function (mod) {
@@ -14,7 +14,7 @@ const sqlite_1 = require("sqlite");
 sqlite3_1.default.verbose();
 ;
 // you would have to import / invoke this in another file
-async function openDb(filename = './tmp/signifly.db') {
+async function openDb(filename = './tmp/sqlite-tst.db') {
     return (0, sqlite_1.open)({
         filename,
         driver: sqlite3_1.default.Database

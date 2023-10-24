@@ -4,11 +4,11 @@
 
 import { openDb, tableExists, createTbl, ColDef } from '../index.js';
 
-const tblName = `signifliers3`;
+const tblName = `tstTbl`;
 const cdefs: ColDef = {
 	name: 'string not null',
 	yrs_exp_gen: 'int not null', // Years experience general
-	yrs_exp_sig: 'int not null', //  Years experience signifly
+	yrs_exp_sig: 'int not null', //  Years experience 
 	skill: 'string',
 };
 

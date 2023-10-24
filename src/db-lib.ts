@@ -1,5 +1,5 @@
 /**
- * SQLite implementation for Signifly Case Assignment for Paul Kirkaas
+ * SQLite implementation
  * Paul Kirkaas, March 2023
  */
 
@@ -17,7 +17,7 @@ export interface ColDef {
 };
 
 // you would have to import / invoke this in another file
-export async function openDb (filename ='./tmp/signifly.db' ) {
+export async function openDb (filename ='./tmp/sqlite-tst.db' ) {
 	return open({
 		filename,
 		driver: sqlite3.Database
