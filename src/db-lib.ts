@@ -3,7 +3,7 @@
  * Paul Kirkaas, March 2023
  */
 
-import { isEmpty, isObject } from './init.js';
+import { isEmpty, isObject } from './index.js';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 sqlite3.verbose();

@@ -12,6 +12,10 @@ pk-ts-node-lib
 
 sqlite & sqlite3
 
+## NOTE
+
+Something wrong with configuration - doesn't re-export all from pk-ts-node-lib, but does export from db-lib, and including this in package.json does include pk-ts-node-lib - but applications that use this sqlite lib need to explicitly import nodelib functionns from node lib, not this sqlite lib.
+
 
 ## Installation:
 

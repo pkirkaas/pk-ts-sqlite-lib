@@ -8,7 +8,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tableExists = exports.createTbl = exports.openDb = void 0;
-const init_js_1 = require("./init.js");
+const index_js_1 = require("./index.js");
 const sqlite3_1 = __importDefault(require("sqlite3"));
 const sqlite_1 = require("sqlite");
 sqlite3_1.default.verbose();
@@ -48,7 +48,7 @@ async function tableExists(db, tblName) {
         type='table' AND name='${tblName}'
     );`;
     let row = await db.get(teStr);
-    if (!row || (0, init_js_1.isEmpty)(row) || !(0, init_js_1.isObject)(row)) {
+    if (!row || (0, index_js_1.isEmpty)(row) || !(0, index_js_1.isObject)(row)) {
         return false;
     }
     let vals = Object.values(row);
