@@ -1,9 +1,7 @@
-"use strict";
 /**
  * Tests for pk-ts-sqlite-lib
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const index_js_1 = require("../index.js");
+import { openDb, createTbl } from '../index.js';
 const tblName = `tstTbl`;
 const cdefs = {
     name: 'string not null',
@@ -16,8 +14,8 @@ let iStr = `INSERT INTO ${tblName} ( name, skill, yrs_exp_gen, yrs_exp_sig, emai
   ( 'TIME MACHINE', 'Passages', 3, 2, 'joe@end.dog' ), ( 'YESTERDAY', 'Unskilled', 7, 3, 'mary@ex.com') ; `;
 let tQ = `SELECT * FROM ${tblName}`;
 await (async () => {
-    const db = await (0, index_js_1.openDb)();
-    await (0, index_js_1.createTbl)(db, tblName, cdefs);
+    const db = await openDb();
+    await createTbl(db, tblName, cdefs);
     let iRes = await db.exec(iStr);
     let res = await db.all(tQ);
     console.log({ res });

@@ -1,18 +1,12 @@
-"use strict";
 /**
  * SQLite implementation
  * Paul Kirkaas, March 2023
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.tableExists = exports.createTbl = exports.openDb = void 0;
-const index_js_1 = require("./index.js");
-const sqlite3_1 = __importDefault(require("sqlite3"));
-const sqlite_1 = require("sqlite");
-const path_1 = __importDefault(require("path"));
-sqlite3_1.default.verbose();
+import { isEmpty, isObject, slashPath, PkError, } from './index.js';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
+import path from 'path';
+sqlite3.verbose();
 ;
 // you would have to import / invoke this in another file
 //export async function openDb (filename ='./tmp/sqlite-tst.db' ) {
@@ -22,27 +16,26 @@ sqlite3_1.default.verbose();
  * The absolute or relative (to invoking directory) path to the db file.
  * Creates if doesn't exist
  */
-async function openDb(filename) {
+export async function openDb(filename) {
     if (!filename) {
         filename = process.env.SQLITE_DB;
     }
     if (!filename) {
-        throw new index_js_1.PkError(`No fileName found in openDb`);
+        throw new PkError(`No fileName found in openDb`);
     }
-    if ((filename !== ':memory') && !path_1.default.isAbsolute(filename)) {
-        filename = (0, index_js_1.slashPath)(process.cwd(), filename);
+    if ((filename !== ':memory') && !path.isAbsolute(filename)) {
+        filename = slashPath(process.cwd(), filename);
     }
     console.log(`About to open [${filename}]`);
-    return (0, sqlite_1.open)({
+    return open({
         filename,
-        driver: sqlite3_1.default.Database
+        driver: sqlite3.Database
     });
 }
-exports.openDb = openDb;
 /**
  * create table in DB if not exists - create id by default
  */
-async function createTbl(db, tblName, colDefs) {
+export async function createTbl(db, tblName, colDefs) {
     if (!('id' in colDefs)) {
         //colDefs.id = "int primary key not null AUTOINCREMENT";
         colDefs.id = "INTEGER PRIMARY KEY AUTOINCREMENT";
@@ -60,13 +53,12 @@ async function createTbl(db, tblName, colDefs) {
     console.log({ cstr });
     return db.exec(cstr);
 }
-exports.createTbl = createTbl;
-async function tableExists(db, tblName) {
+export async function tableExists(db, tblName) {
     let teStr = ` SELECT EXISTS ( SELECT 'name' FROM 'sqlite_schema' WHERE 
         type='table' AND name='${tblName}'
     );`;
     let row = await db.get(teStr);
-    if (!row || (0, index_js_1.isEmpty)(row) || !(0, index_js_1.isObject)(row)) {
+    if (!row || isEmpty(row) || !isObject(row)) {
         return false;
     }
     let vals = Object.values(row);
@@ -75,5 +67,4 @@ async function tableExists(db, tblName) {
     }
     return vals[0];
 }
-exports.tableExists = tableExists;
 //# sourceMappingURL=db-lib.js.map
