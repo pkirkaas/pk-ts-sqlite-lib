@@ -2,7 +2,6 @@
  * SQLite implementation
  * Paul Kirkaas, March 2023
  */
-/// <reference types="./vendor-typings/sqlite3" />
 import sqlite3 from 'sqlite3';
 /**
    Table column specification - {[colname]:[colSpecStr]}
@@ -11,6 +10,12 @@ import sqlite3 from 'sqlite3';
 export interface ColDef {
     [key: string]: string;
 }
+/**
+ * Opens/creates  a sqlite file-based DB & returns it.
+ * @param string|null filename
+ * The absolute or relative (to invoking directory) path to the db file.
+ * Creates if doesn't exist
+ */
 export declare function openDb(filename?: string): Promise<import("sqlite").Database<sqlite3.Database, sqlite3.Statement>>;
 /**
  * create table in DB if not exists - create id by default

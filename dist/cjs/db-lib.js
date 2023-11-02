@@ -11,10 +11,28 @@ exports.tableExists = exports.createTbl = exports.openDb = void 0;
 const index_js_1 = require("./index.js");
 const sqlite3_1 = __importDefault(require("sqlite3"));
 const sqlite_1 = require("sqlite");
+const path_1 = __importDefault(require("path"));
 sqlite3_1.default.verbose();
 ;
 // you would have to import / invoke this in another file
-async function openDb(filename = './tmp/sqlite-tst.db') {
+//export async function openDb (filename ='./tmp/sqlite-tst.db' ) {
+/**
+ * Opens/creates  a sqlite file-based DB & returns it.
+ * @param string|null filename
+ * The absolute or relative (to invoking directory) path to the db file.
+ * Creates if doesn't exist
+ */
+async function openDb(filename) {
+    if (!filename) {
+        filename = process.env.SQLITE_DB;
+    }
+    if (!filename) {
+        throw new index_js_1.PkError(`No fileName found in openDb`);
+    }
+    if ((filename !== ':memory') && !path_1.default.isAbsolute(filename)) {
+        filename = (0, index_js_1.slashPath)(process.cwd(), filename);
+    }
+    console.log(`About to open [${filename}]`);
     return (0, sqlite_1.open)({
         filename,
         driver: sqlite3_1.default.Database

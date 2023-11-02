@@ -2,13 +2,31 @@
  * SQLite implementation
  * Paul Kirkaas, March 2023
  */
-import { isEmpty, isObject } from './index.js';
+import { isEmpty, isObject, slashPath, PkError, } from './index.js';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import path from 'path';
 sqlite3.verbose();
 ;
 // you would have to import / invoke this in another file
-export async function openDb(filename = './tmp/sqlite-tst.db') {
+//export async function openDb (filename ='./tmp/sqlite-tst.db' ) {
+/**
+ * Opens/creates  a sqlite file-based DB & returns it.
+ * @param string|null filename
+ * The absolute or relative (to invoking directory) path to the db file.
+ * Creates if doesn't exist
+ */
+export async function openDb(filename) {
+    if (!filename) {
+        filename = process.env.SQLITE_DB;
+    }
+    if (!filename) {
+        throw new PkError(`No fileName found in openDb`);
+    }
+    if ((filename !== ':memory') && !path.isAbsolute(filename)) {
+        filename = slashPath(process.cwd(), filename);
+    }
+    console.log(`About to open [${filename}]`);
     return open({
         filename,
         driver: sqlite3.Database
