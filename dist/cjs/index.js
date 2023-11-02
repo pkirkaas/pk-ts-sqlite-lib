@@ -20,4 +20,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./init.js"), exports);
 __exportStar(require("pk-ts-node-lib"), exports);
 __exportStar(require("./db-lib.js"), exports);
+__exportStar(require("./prisma-lib.js"), exports);
 //# sourceMappingURL=index.js.map

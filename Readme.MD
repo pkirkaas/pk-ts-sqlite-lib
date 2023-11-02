@@ -27,3 +27,6 @@ If using git hooks to build, MUST ADD .git-hooks dir, scripts, & hooksPath = .gi
 
 common contains environment independent features, that are included included in both client & node libraries, which have additional env functionality
 
+### Prisma
+
+Includes some prisma functionality & tests

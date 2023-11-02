@@ -4,8 +4,8 @@
   "author": "Paul Kirkaas",
   "license": "UNLICENSED",
   "description": "TS/JS Utilities for SQLite apps, including common & Node JS functions",
-  "type":"module",
-  "module":"./dist/esm/index.js",
+  "type": "module",
+  "module": "./dist/esm/index.js",
   "main": "./dist/cjs/index.js",
   "exports": {
     ".": {
@@ -25,9 +25,11 @@
     "clean": "rm -rf ./dist ./node_modules package-lock.json && npm i"
   },
   "dependencies": {
+    "@prisma/client": "*",
+    "@types/sqlite3": "*",
     "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
-    "sqlite":"*",
-    "sqlite3":"*",
-    "@types/sqlite3": "*"
+    "prisma": "*",
+    "sqlite": "*",
+    "sqlite3": "*"
   }
 }
