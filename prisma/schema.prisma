@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("PRISMA_DB")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+	pwd String?
+  email     String?   @unique
+  name      String?
+//	role      Role     @default(USER)
+  posts     Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean  @default(false)
+  title     String?   
+  content String?
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+	categories Category[] // Many to Many
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+	name String 
+  posts Post[] // Many to Many
+}
+
+//enum Role {
+//  USER
+//  ADMIN
+//}
