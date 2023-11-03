@@ -29,4 +29,6 @@ common contains environment independent features, that are included included in 
 
 ### Prisma
 
-Includes some prisma functionality & tests
+Includes some prisma functionality & tests. Should really make prisma a separate lib, not part of sqlite.
+
+Prisma tests included, but need to initialize prisma in any implementing app.

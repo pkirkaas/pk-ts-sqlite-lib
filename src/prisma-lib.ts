@@ -2,18 +2,37 @@
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
 
-import { isObject, dtFmt, isPrimitive, GenObj, PkError,  isSubset, strIncludesAny, isEmpty,  } from './init.js';
+import { isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, } from './init.js';
 
-import { PrismaClient, } from '@prisma/client';
+import { Prisma, PrismaClient, } from '@prisma/client';
 
 export let prisma: GenObj = {};
 
-export async function getPrisma(pextends?:GenObj) {
+/**
+ * Common enhancements/extensions to prisma client, to be merged
+ * with custom extensions per implementing app
+ */
+export let commonExtends = { // Common extensions, to merge w. custom 
+	model: {
+		$allModels: {
+			async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']
+				//): Promise<boolean> {
+			): Promise<any> {
+				// Get the current model at runtime
+				const context = Prisma.getExtensionContext(this)
+				const result = await (context as any).findFirst({ where })
+				//return result !== null
+				return result; // Null or the instance
+			},
+		},
+	},
+};
+
+export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
 		prisma = await new PrismaClient();
-		if (!isEmpty(pextends)) {
-			prisma = await prisma.$extends(pextends);
-		}
+		let mExtends = mergeAndConcat(commonExtends, pextends);
+		prisma = await prisma.$extends(mExtends);
 	}
 	return prisma;
 }
@@ -47,8 +66,12 @@ export async function clearTables(tables?: any) {
 	console.log({ tables });
 	for (let table of tables) {
 		console.log(`Trying to delete [${table}]`);
-		//@ts-ignore
-		await prisma[table].deleteMany();
+		try {
+			//@ts-ignore
+			await prisma[table].deleteMany();
+		} catch (e) {
+			console.error(`Problem emptying table: [${table}]:`, e);
+		}
 	}
 }
 

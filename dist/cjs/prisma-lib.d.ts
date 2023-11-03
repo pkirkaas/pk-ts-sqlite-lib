@@ -2,7 +2,19 @@
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
 import { GenObj } from './init.js';
+import { Prisma } from '@prisma/client';
 export declare let prisma: GenObj;
+/**
+ * Common enhancements/extensions to prisma client, to be merged
+ * with custom extensions per implementing app
+ */
+export declare let commonExtends: {
+    model: {
+        $allModels: {
+            exists<T>(this: T, where: Prisma.Args<T, "findFirst">["where"]): Promise<any>;
+        };
+    };
+};
 export declare function getPrisma(pextends?: GenObj): Promise<GenObj>;
 export declare function getModelIds(modelName: any): Promise<any>;
 /**
