@@ -6,7 +6,7 @@
 import { Prisma, PrismaClient, } from '@prisma/client';
 import {
 	getFilePaths, slashPath, dbgWrt, ask, runCli, sassMapStringToJson, sassMapStringToObj, saveData, isFile, getOsType, isWindows, isLinux, runCommand, stdOut, winBashes,
-	getPrisma, allProps, allPropsWithTypes, getProps,
+	getPrisma, allProps, allPropsWithTypes, getProps, asEnumerable,
 } from '../index.js';
 
 let prisma = await getPrisma();
@@ -18,6 +18,23 @@ import { mergeAndConcat, isEmpty, typeOf } from 'pk-ts-common-lib';
 let testsFs = {
 	doesRun: function () {
 		console.log("Yes, does Run!!");
+	},
+	tstDMMF: async function () {
+		let pmx = await getPrisma();
+		let dmmf = asEnumerable(pmx);
+		//let pmxProps = allProps(pmx, 'tpv', 4);
+		//let fields = asEnumerable(pmx.user.fields);
+		dbgWrt(dmmf);
+		//console.log({ pmxProps });
+		console.log("Done");
+	},
+	tstClient: async function () {
+		let pmx = await getPrisma();
+		let pmxProps = allProps(pmx, 'tpv', 4);
+		let fields = asEnumerable(pmx.user.fields);
+		dbgWrt(pmxProps);
+		//console.log({ pmxProps });
+		console.log("Done", { fields });
 	},
 	tstFields: async function () {
 		//let pmx = await getPrisma();

@@ -2,7 +2,10 @@
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
 
-import { isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, } from './init.js';
+import {
+	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable,
+
+} from './init.js';
 
 import { Prisma, PrismaClient, } from '@prisma/client';
 
@@ -63,6 +66,12 @@ export let commonExtends = { // Common extensions, to merge w. custom
 			},
 			getFields(this) {
 				const context = Prisma.getExtensionContext(this);
+				let fields = asEnumerable(context.fields);
+				return fields;
+
+
+
+				/*
 				let rawFields = context.fields;
 				let fieldKeys = Object.getOwnPropertyNames(rawFields);
 				let fields: GenObj = {};
@@ -70,6 +79,7 @@ export let commonExtends = { // Common extensions, to merge w. custom
 					fields[fKey] = rawFields[fKey];
 				}
 				return fields;
+				*/
 			},
 
 			/*

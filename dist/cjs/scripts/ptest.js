@@ -2,12 +2,29 @@
  * Tests for Prisma DB
  * Assumes Prisma has been initialized
  */
-import { dbgWrt, runCli, getPrisma, allProps, getProps, } from '../index.js';
+import { dbgWrt, runCli, getPrisma, allProps, getProps, asEnumerable, } from '../index.js';
 let prisma = await getPrisma();
 import { typeOf } from 'pk-ts-common-lib';
 let testsFs = {
     doesRun: function () {
         console.log("Yes, does Run!!");
+    },
+    tstDMMF: async function () {
+        let pmx = await getPrisma();
+        let dmmf = asEnumerable(pmx);
+        //let pmxProps = allProps(pmx, 'tpv', 4);
+        //let fields = asEnumerable(pmx.user.fields);
+        dbgWrt(dmmf);
+        //console.log({ pmxProps });
+        console.log("Done");
+    },
+    tstClient: async function () {
+        let pmx = await getPrisma();
+        let pmxProps = allProps(pmx, 'tpv', 4);
+        let fields = asEnumerable(pmx.user.fields);
+        dbgWrt(pmxProps);
+        //console.log({ pmxProps });
+        console.log("Done", { fields });
     },
     tstFields: async function () {
         //let pmx = await getPrisma();
