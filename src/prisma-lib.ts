@@ -3,7 +3,7 @@
  */
 
 import {
-	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable,
+	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, 
 
 } from './init.js';
 
@@ -57,13 +57,38 @@ export let commonExtends = { // Common extensions, to merge w. custom
 				//return result !== null
 				return result; // Null or the instance
 			},
-			// Returns an instance based on id, or null
-			async byId<T>(this: T, id: any): Promise<any> {
-				id = parseInt(id);
+			/**
+			 * Returns an instance or refreshed instanced based on id, or null
+			 * So can add include relations if missing from orig result
+			 * @param idOrInstance - 
+			 * @param string|string[]|GenObj include - relations to include. 
+			 *   string or array of strings to convert into object {[relName]:true}
+		  */
+			async byId<T>(this: T, idOrInstance: any, include: string | string[] | GenObj = {}): Promise<any> {
+				if (isObject(idOrInstance)) {
+					idOrInstance = idOrInstance.id;
+				}
+				if (typeof include === 'string') {
+					include = { [include]: true };
+				} else if (Array.isArray(include)) {
+					let res = {};
+					for (let rel of include) {
+						res[rel] = true;
+					}
+					include = res;
+				}
+				let id  = parseInt(idOrInstance);
+				let query = {
+					where: { id }, include
+				};
+				console.log({ query });
 				const context = Prisma.getExtensionContext(this);
-				const result = (context as any).findFirst({ where: { id } });
+				//const result = (context as any).findFirst({ where: { id }, include });
+				const result = (context as any).findFirst(query);
 				return result;
 			},
+
+
 			getFields(this) {
 				const context = Prisma.getExtensionContext(this);
 				let fields = asEnumerable(context.fields);
@@ -73,7 +98,7 @@ export let commonExtends = { // Common extensions, to merge w. custom
 
 			//Returns just the ids for instances - if where, matching, else all 
 			async getIds<T>(this: T, where?: Prisma.Args<T, 'findMany'>['where']): Promise<Number[]> {
-				console.log(where);
+				//console.log(where);
 				const context = Prisma.getExtensionContext(this)
 				const result = await (context as any).findMany({ select: { id: true }, where })
 				let ids = result.map((el) => el.id);
@@ -86,69 +111,48 @@ export let commonExtends = { // Common extensions, to merge w. custom
 export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
 		prisma = await new PrismaClient();
-		/*
-		let fieldName = 'silly';
-		let fieldDef = {
-			needs: {},
-			compute: function (instance) {
-				let xId = instance.id;
-				return `Computed silly: [${xId}]`;
-			}
-		};
-		*/
 
 		let fieldDefs = {
-			sillier: {
-				needs: { id: true },
-				compute: function (instance) {
-				let xId = instance.id;
-				return `Computed sillier: [${xId}]`;
+			save: {
+				needs: { id: true, },
+				compute: async function (instance) {
+					let modelClass = instance.getModelClass();
+					let id = instance.id;
+					let res = modelClass.update({
+						where: { id },
+						data: {
+							///email:"JohnJJones@example.com",
+							email:"Harry@example.com",
+						}
+					});
+					return res;
+				}
+			}, 
+			/*
+			removeRelation: {
+				needs: { id: true, },
+				compute: async function (instance) {
+					let Model = instance.getModelClass();
+					return async (rel:string,  
 				}
 			},
-			xsave: {
-				//needs: { id: true, },
-				compute: async function (instance) {
-					let modelClass = instance.getModelClass();
-					let id = instance.id;
-					let res = modelClass.update({
-						where: { id },
-						data: {
-							///email:"JohnJJones@example.com",
-							email:"Harry@example.com",
-						}
-					});
-					return res;
-				}
-			}, 
-			save: {
-				//needs: { id: true, },
-				compute: async function (instance) {
-					let modelClass = instance.getModelClass();
-					let id = instance.id;
-					let res = modelClass.update({
-						where: { id },
-						data: {
-							///email:"JohnJJones@example.com",
-							email:"Harry@example.com",
-						}
-					});
-					return res;
-				}
-			}, 
+			*/
+			/*
 			tstArg: {
 				compute(instance) {
 					return (it) => {
-						console.log({ it });
+						//console.log({ it });
 						return it;
 					}
 				}
 			}
+			*/
 		};
 
 
 		//let tstRes = await addFieldsToAllResults({ silly: fieldDef });
 		let tstRes = await addFieldsToAllResults(fieldDefs);
-		console.log({ tstRes, fieldDefs });
+		//console.log({ tstRes, fieldDefs });
 
 
 		let resExtensions = await addModelNameToAllResults();
@@ -203,9 +207,9 @@ export async function clearTables(tables?: any) {
 	if (!isSubset(tableNames, tables)) { //Bad table name in tables
 		throw new PkError(`Invalid table name for clearTables:`, { tables, tableNames });
 	}
-	console.log({ tables });
+	//console.log({ tables });
 	for (let table of tables) {
-		console.log(`Trying to delete [${table}]`);
+		//console.log(`Trying to delete [${table}]`);
 		try {
 			//@ts-ignore
 			await prisma[table].deleteMany();
@@ -237,7 +241,7 @@ export async function addRelated(from: GenObj, to: GenObj) {
 			}
 		}
 	};
-	console.log(`Executing update query on [${fromName}]:`, { updateQuery });
+	//console.log(`Executing update query on [${fromName}]:`, { updateQuery });
 	//@ts-ignore
 	let res = await prisma[fromName].update(updateQuery);
 	return res;
@@ -381,7 +385,7 @@ export async function getById(model, id, include: any = null) {
 	id = parseInt(id);
 	let query: GenObj = { where: { id } };
 	let origInclude = include;
-	console.log("Entery getById - include:", { include });
+	//console.log("Entery getById - include:", { include });
 	if (include) {
 		id = parseInt(id);
 		if (typeof include === 'string') {
@@ -402,7 +406,7 @@ export async function getById(model, id, include: any = null) {
 		}
 		query.include = include.include;
 	}
-	console.log('Debugging getById include:', { include, query });
+	//console.log('Debugging getById include:', { include, query });
 
 	//@ts-ignore
 	return await prisma[model].findUnique(query);

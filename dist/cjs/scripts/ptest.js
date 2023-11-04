@@ -42,15 +42,19 @@ let testsFs = {
     },
     async tstUsr() {
         let user = await prisma.user.findFirst();
+        /*
         let weird = user.tstArg("Some weird String");
         //let ids = await prisma.user.getIds('anarg');
         //let where = { name: 'Trevion' };
-        let where = { pwd: 'tstpwd', };
+        let where = { pwd: 'tstpwd',};
         let ids = await prisma.user.getIds(where);
         //let u2 = await user.save();
         let u2 = await user.save;
         let u3 = await u2.xsave;
-        console.log({ user, u2, u3, ids, weird });
+        */
+        let refresh = await prisma.user.byId(user, 'posts');
+        //console.log({ user, u2, u3, ids, weird, refresh });
+        console.log({ user, refresh });
     },
     tstUsrsOld: async function () {
         let pmx = await getPrisma();

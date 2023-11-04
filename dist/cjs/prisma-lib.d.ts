@@ -13,7 +13,14 @@ export declare let commonExtends: {
     model: {
         $allModels: {
             exists<T>(this: T, where: Prisma.Args<T, "findFirst">["where"]): Promise<any>;
-            byId<T_1>(this: T_1, id: any): Promise<any>;
+            /**
+             * Returns an instance or refreshed instanced based on id, or null
+             * So can add include relations if missing from orig result
+             * @param idOrInstance -
+             * @param string|string[]|GenObj include - relations to include.
+             *   string or array of strings to convert into object {[relName]:true}
+          */
+            byId<T_1>(this: T_1, idOrInstance: any, include?: string | string[] | GenObj): Promise<any>;
             getFields(this: any): GenObj;
             getIds<T_2>(this: T_2, where?: Prisma.Args<T_2, "findMany">["where"]): Promise<Number[]>;
         };

@@ -50,11 +50,35 @@ export let commonExtends = {
                 //return result !== null
                 return result; // Null or the instance
             },
-            // Returns an instance based on id, or null
-            async byId(id) {
-                id = parseInt(id);
+            /**
+             * Returns an instance or refreshed instanced based on id, or null
+             * So can add include relations if missing from orig result
+             * @param idOrInstance -
+             * @param string|string[]|GenObj include - relations to include.
+             *   string or array of strings to convert into object {[relName]:true}
+          */
+            async byId(idOrInstance, include = {}) {
+                if (isObject(idOrInstance)) {
+                    idOrInstance = idOrInstance.id;
+                }
+                if (typeof include === 'string') {
+                    include = { [include]: true };
+                }
+                else if (Array.isArray(include)) {
+                    let res = {};
+                    for (let rel of include) {
+                        res[rel] = true;
+                    }
+                    include = res;
+                }
+                let id = parseInt(idOrInstance);
+                let query = {
+                    where: { id }, include
+                };
+                console.log({ query });
                 const context = Prisma.getExtensionContext(this);
-                const result = context.findFirst({ where: { id } });
+                //const result = (context as any).findFirst({ where: { id }, include });
+                const result = context.findFirst(query);
                 return result;
             },
             getFields() {
@@ -64,7 +88,7 @@ export let commonExtends = {
             },
             //Returns just the ids for instances - if where, matching, else all 
             async getIds(where) {
-                console.log(where);
+                //console.log(where);
                 const context = Prisma.getExtensionContext(this);
                 const result = await context.findMany({ select: { id: true }, where });
                 let ids = result.map((el) => el.id);
@@ -76,41 +100,9 @@ export let commonExtends = {
 export async function getPrisma(pextends = {}) {
     if (isEmpty(prisma)) {
         prisma = await new PrismaClient();
-        /*
-        let fieldName = 'silly';
-        let fieldDef = {
-            needs: {},
-            compute: function (instance) {
-                let xId = instance.id;
-                return `Computed silly: [${xId}]`;
-            }
-        };
-        */
         let fieldDefs = {
-            sillier: {
-                needs: { id: true },
-                compute: function (instance) {
-                    let xId = instance.id;
-                    return `Computed sillier: [${xId}]`;
-                }
-            },
-            xsave: {
-                //needs: { id: true, },
-                compute: async function (instance) {
-                    let modelClass = instance.getModelClass();
-                    let id = instance.id;
-                    let res = modelClass.update({
-                        where: { id },
-                        data: {
-                            ///email:"JohnJJones@example.com",
-                            email: "Harry@example.com",
-                        }
-                    });
-                    return res;
-                }
-            },
             save: {
-                //needs: { id: true, },
+                needs: { id: true, },
                 compute: async function (instance) {
                     let modelClass = instance.getModelClass();
                     let id = instance.id;
@@ -124,18 +116,29 @@ export async function getPrisma(pextends = {}) {
                     return res;
                 }
             },
+            /*
+            removeRelation: {
+                needs: { id: true, },
+                compute: async function (instance) {
+                    let Model = instance.getModelClass();
+                    return async (rel:string,
+                }
+            },
+            */
+            /*
             tstArg: {
                 compute(instance) {
                     return (it) => {
-                        console.log({ it });
+                        //console.log({ it });
                         return it;
-                    };
+                    }
                 }
             }
+            */
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });
         let tstRes = await addFieldsToAllResults(fieldDefs);
-        console.log({ tstRes, fieldDefs });
+        //console.log({ tstRes, fieldDefs });
         let resExtensions = await addModelNameToAllResults();
         commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
         let mExtends = mergeAndConcat(commonExtends, pextends);
@@ -186,9 +189,9 @@ export async function clearTables(tables) {
     if (!isSubset(tableNames, tables)) { //Bad table name in tables
         throw new PkError(`Invalid table name for clearTables:`, { tables, tableNames });
     }
-    console.log({ tables });
+    //console.log({ tables });
     for (let table of tables) {
-        console.log(`Trying to delete [${table}]`);
+        //console.log(`Trying to delete [${table}]`);
         try {
             //@ts-ignore
             await prisma[table].deleteMany();
@@ -216,7 +219,7 @@ export async function addRelated(from, to) {
             }
         }
     };
-    console.log(`Executing update query on [${fromName}]:`, { updateQuery });
+    //console.log(`Executing update query on [${fromName}]:`, { updateQuery });
     //@ts-ignore
     let res = await prisma[fromName].update(updateQuery);
     return res;
@@ -353,7 +356,7 @@ export async function getById(model, id, include = null) {
     id = parseInt(id);
     let query = { where: { id } };
     let origInclude = include;
-    console.log("Entery getById - include:", { include });
+    //console.log("Entery getById - include:", { include });
     if (include) {
         id = parseInt(id);
         if (typeof include === 'string') {
@@ -374,7 +377,7 @@ export async function getById(model, id, include = null) {
         }
         query.include = include.include;
     }
-    console.log('Debugging getById include:', { include, query });
+    //console.log('Debugging getById include:', { include, query });
     //@ts-ignore
     return await prisma[model].findUnique(query);
 }
