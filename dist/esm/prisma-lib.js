@@ -94,15 +94,31 @@ export async function getPrisma(pextends = {}) {
                     return `Computed sillier: [${xId}]`;
                 }
             },
-            save: {
-                needs: { id: true, },
+            xsave: {
+                //needs: { id: true, },
                 compute: async function (instance) {
                     let modelClass = instance.getModelClass();
                     let id = instance.id;
                     let res = modelClass.update({
                         where: { id },
                         data: {
-                            email: "JohnJJones@example.com",
+                            ///email:"JohnJJones@example.com",
+                            email: "Harry@example.com",
+                        }
+                    });
+                    return res;
+                }
+            },
+            save: {
+                //needs: { id: true, },
+                compute: async function (instance) {
+                    let modelClass = instance.getModelClass();
+                    let id = instance.id;
+                    let res = modelClass.update({
+                        where: { id },
+                        data: {
+                            ///email:"JohnJJones@example.com",
+                            email: "Harry@example.com",
                         }
                     });
                     return res;
@@ -119,7 +135,7 @@ export async function getPrisma(pextends = {}) {
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });
         let tstRes = await addFieldsToAllResults(fieldDefs);
-        //console.log({ tstRes });
+        console.log({ tstRes, fieldDefs });
         let resExtensions = await addModelNameToAllResults();
         commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
         let mExtends = mergeAndConcat(commonExtends, pextends);
@@ -254,8 +270,11 @@ async function addFieldsToAllResults(fieldDefs) {
         let fieldDef = fieldDefs[fieldName];
         for (let name of modelNames) {
             let lcName = name.toLowerCase();
+            if (!res[lcName]) {
+                res[lcName] = {};
+            }
             //res[lcName] = { fieldName: fieldDef }; 
-            res[lcName] = { [fieldName]: fieldDef };
+            res[lcName][fieldName] = fieldDef;
         }
     }
     return { result: res };

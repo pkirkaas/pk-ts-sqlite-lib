@@ -59,7 +59,8 @@ let testsFs = {
 		let ids = await prisma.user.getIds(where);
 		//let u2 = await user.save();
 		let u2 = await user.save;
-		console.log({ user, u2, ids, weird });
+		let u3 = await u2.xsave;
+		console.log({ user, u2, u3, ids, weird });
 	},
 	tstUsrsOld: async function () {
 		let pmx = await getPrisma();
