@@ -13,6 +13,18 @@ let pstCnt = 3;
 
 const prisma = await getPrisma();
 
+function mkPostData(cnt = pstCnt) {
+	let data = [];
+	for (let i = 0; i < cnt; i++) {
+		data.push({
+			published: true,
+			title: faker.company.catchPhrase(),
+			content:faker.lorem.paragraph(), 
+		});
+	}
+	return data;
+}
+
 function mkUsrData(cnt = usrCnt) {
 	let data = [];
 	for (let i = 0; i < cnt; i++) {
@@ -20,6 +32,8 @@ function mkUsrData(cnt = usrCnt) {
 			name: faker.person.firstName(),
 			email: faker.internet.email(),
 			pwd: 'tstpwd',
+			posts: { create: mkPostData() },
+
 		});
 	}
 	return data;

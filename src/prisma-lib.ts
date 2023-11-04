@@ -13,17 +13,78 @@ export let prisma: GenObj = {};
  * with custom extensions per implementing app
  */
 export let commonExtends = { // Common extensions, to merge w. custom 
+	result: {
+		/*
+		$allInstances: {
+			model: {
+				needs: {},
+				compute(instance) {
+					//const context = Prisma.getExtensionContext(this)
+					return "Not the model";
+				}
+			}
+		},
+		user: {
+			ucname: {
+				needs: {},
+				compute() {
+					return this.name.toUpperCase();
+				},
+			},
+			model: {
+				needs: {},
+				compute(user) {
+					const context = Prisma.getExtensionContext(this)
+					console.log(`in result/model:`, { context, user, that:this});
+					return context.name;
+				},
+			}
+		}
+			*/
+	},
 	model: {
 		$allModels: {
+			// Returns first matching instance, else null. Useless but code example
 			async exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']
 				//): Promise<boolean> {
 			): Promise<any> {
 				// Get the current model at runtime
 				const context = Prisma.getExtensionContext(this)
-				const result = await (context as any).findFirst({ where })
+				const result = (context as any).findFirst({ where })
 				//return result !== null
 				return result; // Null or the instance
 			},
+			// Returns an instance based on id, or null
+			async byId<T>(this: T, id: any): Promise<any> {
+				id = parseInt(id);
+				const context = Prisma.getExtensionContext(this);
+				const result = (context as any).findFirst({ where: { id } });
+				return result;
+			},
+			getFields(this) {
+				const context = Prisma.getExtensionContext(this);
+				let rawFields = context.fields;
+				let fieldKeys = Object.getOwnPropertyNames(rawFields);
+				let fields: GenObj = {};
+				for (let fKey of fieldKeys) {
+					fields[fKey] = rawFields[fKey];
+				}
+				return fields;
+			},
+
+			/*
+			async getFields() {
+
+			},
+			*/
+
+			//Returns just the ids for instances - if where, matching, else all 
+			async getIds<T>(this: T, where?: Prisma.Args<T, 'findMany'>['where']): Promise<Number[]> {
+				const context = Prisma.getExtensionContext(this)
+				const result = await (context as any).findMany({ select: { id: true }, where })
+				let ids = result.map((el) => el.id);
+				return ids;
+			}
 		},
 	},
 };
@@ -31,12 +92,29 @@ export let commonExtends = { // Common extensions, to merge w. custom
 export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
 		prisma = await new PrismaClient();
+		let resExtensions = await addModelNameToAllResults();
+		commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
 		let mExtends = mergeAndConcat(commonExtends, pextends);
 		prisma = await prisma.$extends(mExtends);
 	}
 	return prisma;
 }
 
+/** Returns the model names known to Prisma
+ *  Can be Model names or Table names
+ * @param boolean key : true - return the keys or values
+ * @return string[] = the model or table names
+// { User: 'User', Post: 'Post', Category: 'Category' }
+ * Maps model names to table names - not sure which is which...
+ */
+export function getModelNames(key = true) {
+	let modelNames = Prisma.ModelName; //Simple object
+	if (key) {
+		return Object.keys(modelNames);
+	} else {
+		return Object.values(modelNames);
+	}
+}
 
 export async function getModelIds(modelName) {
 	//@ts-ignore
@@ -55,8 +133,11 @@ export async function clearTables(tables?: any) {
 	if (tables && !Array.isArray(tables)) {
 		tables = [tables];
 	}
+	/*
 	let tableMap = await getTableMap();
 	let tableNames = Object.keys(tableMap);
+	*/
+	let tableNames = getModelNames();
 	if (!tables) {
 		tables = tableNames;
 	}
@@ -103,6 +184,76 @@ export async function addRelated(from: GenObj, to: GenObj) {
 	return res;
 }
 
+/**
+ * Gotta be a better way - but adds modelName & lcModelName to all results
+ * @return object to be merged to result key of $extends
+ */
+async function addModelNameToAllResults() {
+	let modelNames = getModelNames();
+	let res: GenObj = {};
+	for (let name of modelNames) {
+		let lcName = name.toLowerCase();
+		res[lcName] = {
+			modelName: {
+				needs: {},
+				compute() {
+					return name;
+				}
+			},
+			lcModelName: {
+				needs: {},
+				compute() {
+					return lcName;
+				}
+			},
+			getModelClass: {
+				needs: {},
+				compute(instance) {
+					return () => prisma[lcName];
+				}
+			},
+			/*
+			modelClass: {
+				needs: {},
+				  compute(instance) {
+				//async compute(instance) {
+					//return await prisma[lcName];
+					return prisma[lcName];
+				}
+			},
+			*/
+		};
+	}
+	return res;
+}
+
+/*
+async function addCompFieldToAllResults() {
+	let modelNames = getModelNames();
+	let res: GenObj = {};
+	for (let name of modelNames) {
+		let lcName = name.toLowerCase();
+		res[lcName] = {
+			modelName: {
+				compute() {
+					return name;
+				}
+			},
+			lcModelName: {
+				compute() {
+					return lcName;
+				}
+			},
+			modelClass: {
+				compute(instance) {
+					return prisma[lcName];
+				}
+			},
+		};
+	}
+	return res;
+}
+*/
 
 // Kind of caching of table map...
 export let tableMap: GenObj = {};

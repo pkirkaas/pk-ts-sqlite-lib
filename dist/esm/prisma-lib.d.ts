@@ -9,13 +9,25 @@ export declare let prisma: GenObj;
  * with custom extensions per implementing app
  */
 export declare let commonExtends: {
+    result: {};
     model: {
         $allModels: {
             exists<T>(this: T, where: Prisma.Args<T, "findFirst">["where"]): Promise<any>;
+            byId<T_1>(this: T_1, id: any): Promise<any>;
+            getFields(this: any): GenObj;
+            getIds<T_2>(this: T_2, where?: Prisma.Args<T_2, "findMany">["where"]): Promise<Number[]>;
         };
     };
 };
 export declare function getPrisma(pextends?: GenObj): Promise<GenObj>;
+/** Returns the model names known to Prisma
+ *  Can be Model names or Table names
+ * @param boolean key : true - return the keys or values
+ * @return string[] = the model or table names
+// { User: 'User', Post: 'Post', Category: 'Category' }
+ * Maps model names to table names - not sure which is which...
+ */
+export declare function getModelNames(key?: boolean): string[];
 export declare function getModelIds(modelName: any): Promise<any>;
 /**
  * Empty tables
