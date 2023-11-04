@@ -6,6 +6,12 @@ import { dbgWrt, runCli, getPrisma, allProps, getProps, asEnumerable, } from '..
 let prisma = await getPrisma();
 import { typeOf } from 'pk-ts-common-lib';
 let testsFs = {
+    async tstAs() {
+        console.log('Even async tstAs?');
+    },
+    tstKey() {
+        console.log("Yes, tstKey works Run!!");
+    },
     doesRun: function () {
         console.log("Yes, does Run!!");
     },
@@ -34,7 +40,18 @@ let testsFs = {
         let pFields = pModel.getFields();
         console.log({ uFields, pFields });
     },
-    tstUsrs: async function () {
+    async tstUsr() {
+        let user = await prisma.user.findFirst();
+        let weird = user.tstArg("Some weird String");
+        //let ids = await prisma.user.getIds('anarg');
+        //let where = { name: 'Trevion' };
+        let where = { pwd: 'tstpwd', };
+        let ids = await prisma.user.getIds(where);
+        //let u2 = await user.save();
+        let u2 = await user.save;
+        console.log({ user, u2, ids, weird });
+    },
+    tstUsrsOld: async function () {
         let pmx = await getPrisma();
         let uModel = await prisma.user;
         //let UMProps = allProps(uModel,'tv',2);

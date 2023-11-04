@@ -68,28 +68,12 @@ export let commonExtends = { // Common extensions, to merge w. custom
 				const context = Prisma.getExtensionContext(this);
 				let fields = asEnumerable(context.fields);
 				return fields;
-
-
-
-				/*
-				let rawFields = context.fields;
-				let fieldKeys = Object.getOwnPropertyNames(rawFields);
-				let fields: GenObj = {};
-				for (let fKey of fieldKeys) {
-					fields[fKey] = rawFields[fKey];
-				}
-				return fields;
-				*/
 			},
 
-			/*
-			async getFields() {
-
-			},
-			*/
 
 			//Returns just the ids for instances - if where, matching, else all 
 			async getIds<T>(this: T, where?: Prisma.Args<T, 'findMany'>['where']): Promise<Number[]> {
+				console.log(where);
 				const context = Prisma.getExtensionContext(this)
 				const result = await (context as any).findMany({ select: { id: true }, where })
 				let ids = result.map((el) => el.id);
@@ -102,10 +86,59 @@ export let commonExtends = { // Common extensions, to merge w. custom
 export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
 		prisma = await new PrismaClient();
+		/*
+		let fieldName = 'silly';
+		let fieldDef = {
+			needs: {},
+			compute: function (instance) {
+				let xId = instance.id;
+				return `Computed silly: [${xId}]`;
+			}
+		};
+		*/
+
+		let fieldDefs = {
+			sillier: {
+				needs: { id: true },
+				compute: function (instance) {
+				let xId = instance.id;
+				return `Computed sillier: [${xId}]`;
+				}
+			},
+			save: {
+				needs: { id: true, },
+				compute: async function (instance) {
+					let modelClass = instance.getModelClass();
+					let id = instance.id;
+					let res = modelClass.update({
+						where: { id },
+						data: {
+							email:"JohnJJones@example.com",
+						}
+					});
+					return res;
+				}
+			}, 
+			tstArg: {
+				compute(instance) {
+					return (it) => {
+						console.log({ it });
+						return it;
+					}
+				}
+			}
+		};
+
+
+		//let tstRes = await addFieldsToAllResults({ silly: fieldDef });
+		let tstRes = await addFieldsToAllResults(fieldDefs);
+		//console.log({ tstRes });
+
+
 		let resExtensions = await addModelNameToAllResults();
 		commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
 		let mExtends = mergeAndConcat(commonExtends, pextends);
-		prisma = await prisma.$extends(mExtends);
+		prisma = await prisma.$extends(mExtends).$extends(tstRes);
 	}
 	return prisma;
 }
@@ -222,19 +255,34 @@ async function addModelNameToAllResults() {
 					return () => prisma[lcName];
 				}
 			},
-			/*
-			modelClass: {
-				needs: {},
-				  compute(instance) {
-				//async compute(instance) {
-					//return await prisma[lcName];
-					return prisma[lcName];
-				}
-			},
-			*/
 		};
 	}
 	return res;
+}
+
+
+/**
+ * To add methods/computed properties to ALL model instances. 
+ * THOUGHT the $extends.result key accepted $allInstances, like 
+ * model $allModels, but not?
+ * @param object {fieldName:fieldDef - like: {needs:{}, compute: function (instance) {
+ *   return something;
+ * }
+ */
+//async function addFieldsToAllResults(fieldName:string, fieldDef:GenObj) {
+async function addFieldsToAllResults(fieldDefs:GenObj) {
+	let modelNames = getModelNames();
+	let res: GenObj = {};
+	let fieldNames = Object.keys(fieldDefs);
+	for (let fieldName of fieldNames) {
+		let fieldDef = fieldDefs[fieldName];
+		for (let name of modelNames) {
+			let lcName = name.toLowerCase();
+			//res[lcName] = { fieldName: fieldDef }; 
+			res[lcName] = { [fieldName]: fieldDef };
+		}
+	}
+	return { result: res };
 }
 
 /*
