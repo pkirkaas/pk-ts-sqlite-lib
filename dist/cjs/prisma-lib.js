@@ -323,7 +323,7 @@ export async function getPrisma(pextends = {}) {
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });
         let tstRes = await addFieldsToAllResults(fieldDefs);
-        //console.log({ tstRes, fieldDefs });
+        console.log({ tstRes, fieldDefs });
         let resExtensions = await addModelNameToAllResults();
         commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
         let mExtends = mergeAndConcat(commonExtends, pextends);
@@ -419,6 +419,7 @@ async function addModelNameToAllResults() {
     for (let name of modelNames) {
         let lcName = name.toLowerCase();
         res[lcName] = {
+            //res[name] = {
             modelName: {
                 needs: {},
                 compute() {
@@ -434,7 +435,7 @@ async function addModelNameToAllResults() {
             getModelClass: {
                 needs: {},
                 compute(instance) {
-                    return () => prisma[lcName];
+                    return () => prisma[name];
                 }
             },
         };
