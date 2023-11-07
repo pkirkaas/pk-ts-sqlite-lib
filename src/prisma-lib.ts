@@ -57,7 +57,7 @@ export  function getSchema(lPrisma = Prisma) {
 	let modelValues:GenObj[] = Object.values(models);
 	let toModels = typeOf(models);
 	let toValues = typeOf(modelValues);
-	console.log({ toModels, toValues,  });
+	//console.log({ toModels, toValues,  });
 	//console.log({  modelValues });
 	// Models are in an array
 	let ret: GenObj = {};
@@ -166,7 +166,7 @@ export let commonExtends = { // Common extensions, to merge w. custom
 				let query = {
 					where: { id }, include
 				};
-				console.log({ query });
+				//console.log({ query });
 				const context = Prisma.getExtensionContext(this);
 				//const result = (context as any).findFirst({ where: { id }, include });
 				const result = (context as any).findFirst(query);
@@ -352,7 +352,7 @@ export async function getPrisma(pextends: GenObj = {}) {
 
 		//let tstRes = await addFieldsToAllResults({ silly: fieldDef });
 		let tstRes = await addFieldsToAllResults(fieldDefs);
-		console.log({ tstRes, fieldDefs });
+		//console.log({ tstRes, fieldDefs });
 
 
 		let resExtensions = await addModelNameToAllResults();

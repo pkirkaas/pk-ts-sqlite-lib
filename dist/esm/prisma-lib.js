@@ -48,7 +48,7 @@ export function getSchema(lPrisma = Prisma) {
     let modelValues = Object.values(models);
     let toModels = typeOf(models);
     let toValues = typeOf(modelValues);
-    console.log({ toModels, toValues, });
+    //console.log({ toModels, toValues,  });
     //console.log({  modelValues });
     // Models are in an array
     let ret = {};
@@ -158,7 +158,7 @@ export let commonExtends = {
                 let query = {
                     where: { id }, include
                 };
-                console.log({ query });
+                //console.log({ query });
                 const context = Prisma.getExtensionContext(this);
                 //const result = (context as any).findFirst({ where: { id }, include });
                 const result = context.findFirst(query);
@@ -323,7 +323,7 @@ export async function getPrisma(pextends = {}) {
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });
         let tstRes = await addFieldsToAllResults(fieldDefs);
-        console.log({ tstRes, fieldDefs });
+        //console.log({ tstRes, fieldDefs });
         let resExtensions = await addModelNameToAllResults();
         commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
         let mExtends = mergeAndConcat(commonExtends, pextends);
