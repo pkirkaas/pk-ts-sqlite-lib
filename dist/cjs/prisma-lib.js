@@ -115,7 +115,8 @@ export function getMergedData(instance, data = {}) {
 /**
  * Takes an argument and returns an array of objects of {id:id}
  * For connect/disconnect/set
- * @param arg - an integer, array of integers, an object/instance or array of objects with id key
+ * TODO: Arrays work for one-to-many, but not required - consider the other side - maybe only return array if input is array?
+ * @param arg - instance ID or instance object, or array of ids or instances
  * @return {id:id}[]
  */
 function toIdArray(arg) {
@@ -183,7 +184,7 @@ export async function getPrisma(pextends = {}) {
                 }
             },
             /**
-             * Connect/disconnect/set relationships
+             * Connect/disconnect/set one-to-many relationships
              * Also saves instance changes
              * Fragile - depends on calling with appropriate relationship name
              */

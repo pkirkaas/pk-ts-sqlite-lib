@@ -52,29 +52,24 @@ let testsFs = {
 	},
 	async tstUsr() {
 		let user = await prisma.user.findFirst();
-		user.name = "Koala Days";
-		// @ts-ignore
-		// @ts-ignore
+		user.name = "Koala Nights";
 		let u2 = await user.save({ email: 'BBBZZZ@butts.com' });
-		//let u3 = await u2.connect('posts', 61 );
-		u2.pwd = 'abcabc';
-		let u3 = await u2.set('posts', [41, 61] );
+		await u2.connect('posts', 44 );
+		await u2.connect('posts', 37 );
+		u2.pwd = 'abcakbc';
+		//let u3 = await u2.set('posts', [41, 61] );
 		//let u3 = await u2.disconnect('posts', 41 );
 		//let u3 = await u2.addRelationship('posts',  61 );
 		//let u4 = await u3.addRelationship('posts',  41 );
-		//await u3.addRelationship('posts',  99 );
 		/*
-		let weird = user.tstArg("Some weird String");
 		//let ids = await prisma.user.getIds('anarg');
 		//let where = { name: 'Trevion' };
-		let where = { pwd: 'tstpwd',};
-		let ids = await prisma.user.getIds(where);
 		//let u2 = await user.save();
 		let u2 = await user.save;
 		let u3 = await u2.xsave;
 		*/
-		//let refresh = await prisma.user.byId(user, 'posts');
-		let refresh = await prisma.user.byId(user);
+		let refresh = await prisma.user.byId(user, 'posts');
+		//let refresh = await prisma.user.byId(user);
 
 		//console.log({ user, u2, u3, ids, weird, refresh });
 		console.log({ user, refresh, });
