@@ -34,7 +34,7 @@ export declare let commonExtends: {
  * @param data - Optional - the data to merge
  * @return object with just the table values
  */
-export declare function getMergedData(modelClass: any, instance: any, data?: GenObj): GenObj;
+export declare function getMergedData(instance: any, data?: GenObj): GenObj;
 /**
  * Singleton implementation of PrismaClient, with some default extensions if you want it
  * Adds some generic methods to all Models & Instances

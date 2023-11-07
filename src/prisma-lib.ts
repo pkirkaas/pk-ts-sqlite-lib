@@ -120,8 +120,8 @@ export let commonExtends = { // Common extensions, to merge w. custom
  * @return object with just the table values
  */
 
-export function getMergedData(modelClass, instance, data: GenObj = {}) {
-	let tableFields = Object.keys(modelClass.getFields());
+export function getMergedData( instance, data: GenObj = {}) {
+	let tableFields = Object.keys(instance.getModelClass().getFields());
 	let instanceFields = _.pick(instance, tableFields);
 	data = mergeAndConcat(instanceFields, data);
 	return data;
@@ -161,6 +161,22 @@ export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
 		prisma = await new PrismaClient();
 
+		// Internal functions to avoid copy/paste
+
+		/**
+		 * Make data for connect/disconnect/set, also saving instance changes
+		 */
+		function mkRelUpdate(instance:GenObj, relname:string, rels, operation: string): Promise<GenObj> {
+			let modelClass = instance.getModelClass();
+			let relArr = toIdArray(rels);
+			let id = instance.id;
+			let data = getMergedData( instance, { [relname]: { [operation]: relArr } });
+			return modelClass.update({
+				where: { id },
+				data,
+			});
+		}
+
 		let fieldDefs = {
 			// TODO: Make work with instance data that has been locally modified.
 			// Saves changes to instance data, and any data passed as data arg
@@ -173,12 +189,7 @@ export async function getPrisma(pextends: GenObj = {}) {
 					//console.log("Enter save; instance:", { instance });
 					return (data: GenObj = {}) => {
 						// Experiment with this - check edge cases
-						/*
-						let tableFields = Object.keys(modelClass.getFields());
-						let instanceFields = _.pick(instance, tableFields);
-						data = mergeAndConcat(instanceFields, data);
-						*/
-						data = getMergedData(modelClass, instance, data);
+						data = getMergedData( instance, data);
 						//console.log({ data, tableFields, instanceFields });
 						let res = modelClass.update({
 							where: { id },
@@ -190,25 +201,15 @@ export async function getPrisma(pextends: GenObj = {}) {
 			},
 
 			/**
-			 * Connect a relationship/relationships
+			 * Connect/disconnect/set relationships
+			 * Also saves instance changes
 			 * Fragile - depends on calling with appropriate relationship name
 			 */
 			connect: {
 				needs: { id: true, },
 				compute: function (instance) {
-					let modelClass = instance.getModelClass();
-					let id = instance.id;
 					return (relname: string, rels) => {
-						let relarr = toIdArray(rels);
-						let res = modelClass.update({
-							where: { id },
-							data: {
-								[relname]: {
-									connect: relarr,
-								}
-							}
-						});
-						return res;
+						return mkRelUpdate(instance, relname, rels, 'connect');
 					}
 				}
 			},
@@ -216,19 +217,8 @@ export async function getPrisma(pextends: GenObj = {}) {
 			disconnect: {
 				needs: { id: true, },
 				compute: function (instance) {
-					let modelClass = instance.getModelClass();
-					let id = instance.id;
 					return (relname: string, rels) => {
-						let relarr = toIdArray(rels);
-						let res = modelClass.update({
-							where: { id },
-							data: {
-								[relname]: {
-									disconnect: relarr,
-								}
-							}
-						});
-						return res;
+						return mkRelUpdate(instance, relname, rels, 'disconnect');
 					}
 				}
 			},
@@ -237,6 +227,9 @@ export async function getPrisma(pextends: GenObj = {}) {
 			set: {
 				needs: { id: true, },
 				compute: function (instance) {
+					return (relname: string, rels) => {
+						return mkRelUpdate(instance, relname, rels, 'set');
+					/*
 					let modelClass = instance.getModelClass();
 					let id = instance.id;
 					return (relname: string, rels) => {
@@ -251,6 +244,7 @@ export async function getPrisma(pextends: GenObj = {}) {
 							}
 						});
 						return res;
+						*/
 					}
 				}
 			},
@@ -270,15 +264,6 @@ export async function getPrisma(pextends: GenObj = {}) {
 					}
 				}
 			}
-			/*
-			removeRelation: {
-				needs: { id: true, },
-				compute: async function (instance) {
-					let Model = instance.getModelClass();
-					return async (rel:string,  
-				}
-			},
-			*/
 		};
 
 

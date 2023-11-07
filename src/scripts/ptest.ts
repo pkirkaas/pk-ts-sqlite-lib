@@ -57,8 +57,9 @@ let testsFs = {
 		// @ts-ignore
 		let u2 = await user.save({ email: 'BBBZZZ@butts.com' });
 		//let u3 = await u2.connect('posts', 61 );
-		//let u3 = await u2.set('posts', 41 );
-		let u3 = await u2.disconnect('posts', 41 );
+		u2.pwd = 'abcabc';
+		let u3 = await u2.set('posts', [41, 61] );
+		//let u3 = await u2.disconnect('posts', 41 );
 		//let u3 = await u2.addRelationship('posts',  61 );
 		//let u4 = await u3.addRelationship('posts',  41 );
 		//await u3.addRelationship('posts',  99 );
