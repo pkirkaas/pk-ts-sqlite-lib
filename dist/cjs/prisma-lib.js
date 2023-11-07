@@ -2,6 +2,7 @@
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
 import { isObject, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, } from './init.js';
+import _ from "lodash";
 import { Prisma, PrismaClient, } from '@prisma/client';
 export let prisma = {};
 /**
@@ -53,10 +54,10 @@ export let commonExtends = {
             /**
              * Returns an instance or refreshed instanced based on id, or null
              * So can add include relations if missing from orig result
-             * @param idOrInstance -
+             * @param idOrInstance - a model instance or ID
              * @param string|string[]|GenObj include - relations to include.
              *   string or array of strings to convert into object {[relName]:true}
-          */
+            */
             async byId(idOrInstance, include = {}) {
                 if (isObject(idOrInstance)) {
                     idOrInstance = idOrInstance.id;
@@ -97,25 +98,66 @@ export let commonExtends = {
         },
     },
 };
+/**
+ * Singleton implementation of PrismaClient, with some default extensions if you want it
+ * Adds some generic methods to all Models & Instances
+ */
 export async function getPrisma(pextends = {}) {
     if (isEmpty(prisma)) {
         prisma = await new PrismaClient();
         let fieldDefs = {
+            // TODO: Make work with instance data that has been locally modified.
+            // Saves changes to instance data, and any data passed as data arg
             save: {
                 needs: { id: true, },
-                compute: async function (instance) {
+                //compute: async function (instance) {
+                compute: function (instance) {
                     let modelClass = instance.getModelClass();
                     let id = instance.id;
-                    let res = modelClass.update({
-                        where: { id },
-                        data: {
-                            ///email:"JohnJJones@example.com",
-                            email: "Harry@example.com",
-                        }
-                    });
-                    return res;
+                    //console.log("Enter save; instance:", { instance });
+                    return (data = {}) => {
+                        // Experiment with this - check edge cases
+                        let tableFields = Object.keys(modelClass.getFields());
+                        let instanceFields = _.pick(instance, tableFields);
+                        data = mergeAndConcat(instanceFields, data);
+                        //console.log({ data, tableFields, instanceFields });
+                        let res = modelClass.update({
+                            where: { id },
+                            data,
+                        });
+                        return res;
+                    };
                 }
             },
+            // TODO: Enhance, currently just testing basics...
+            addRelationship: {
+                needs: { id: true, },
+                compute: function (instance) {
+                    let modelClass = instance.getModelClass();
+                    let id = instance.id;
+                    return (relname, relid) => {
+                        let res = modelClass.update({
+                            where: { id },
+                            data: {
+                                [relname]: {
+                                    connect: { id: relid },
+                                }
+                            }
+                        });
+                        return res;
+                    };
+                }
+            },
+            tstArg: {
+                //compute(instance) {
+                needs: { id: true, },
+                compute: function (instance) {
+                    return (it) => {
+                        //console.log({ it });
+                        return it;
+                    };
+                }
+            }
             /*
             removeRelation: {
                 needs: { id: true, },
@@ -124,16 +166,6 @@ export async function getPrisma(pextends = {}) {
                     return async (rel:string,
                 }
             },
-            */
-            /*
-            tstArg: {
-                compute(instance) {
-                    return (it) => {
-                        //console.log({ it });
-                        return it;
-                    }
-                }
-            }
             */
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });

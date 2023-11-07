@@ -3,9 +3,11 @@
  */
 
 import {
-	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, 
+	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable,
 
 } from './init.js';
+
+import _ from "lodash";
 
 import { Prisma, PrismaClient, } from '@prisma/client';
 
@@ -60,10 +62,10 @@ export let commonExtends = { // Common extensions, to merge w. custom
 			/**
 			 * Returns an instance or refreshed instanced based on id, or null
 			 * So can add include relations if missing from orig result
-			 * @param idOrInstance - 
+			 * @param idOrInstance - a model instance or ID
 			 * @param string|string[]|GenObj include - relations to include. 
 			 *   string or array of strings to convert into object {[relName]:true}
-		  */
+			*/
 			async byId<T>(this: T, idOrInstance: any, include: string | string[] | GenObj = {}): Promise<any> {
 				if (isObject(idOrInstance)) {
 					idOrInstance = idOrInstance.id;
@@ -77,7 +79,7 @@ export let commonExtends = { // Common extensions, to merge w. custom
 					}
 					include = res;
 				}
-				let id  = parseInt(idOrInstance);
+				let id = parseInt(idOrInstance);
 				let query = {
 					where: { id }, include
 				};
@@ -108,26 +110,68 @@ export let commonExtends = { // Common extensions, to merge w. custom
 	},
 };
 
+/**
+ * Singleton implementation of PrismaClient, with some default extensions if you want it
+ * Adds some generic methods to all Models & Instances
+ */
 export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
 		prisma = await new PrismaClient();
 
 		let fieldDefs = {
+			// TODO: Make work with instance data that has been locally modified.
+			// Saves changes to instance data, and any data passed as data arg
 			save: {
 				needs: { id: true, },
-				compute: async function (instance) {
+				//compute: async function (instance) {
+				compute:  function (instance) {
 					let modelClass = instance.getModelClass();
 					let id = instance.id;
-					let res = modelClass.update({
-						where: { id },
-						data: {
-							///email:"JohnJJones@example.com",
-							email:"Harry@example.com",
-						}
-					});
-					return res;
+					//console.log("Enter save; instance:", { instance });
+					return  (data: GenObj = {}) => {
+						// Experiment with this - check edge cases
+						let tableFields = Object.keys(modelClass.getFields());
+						let instanceFields = _.pick(instance, tableFields);
+						data = mergeAndConcat(instanceFields, data);
+						//console.log({ data, tableFields, instanceFields });
+						let res = modelClass.update({
+							where: { id },
+							data,
+						});
+						return res;
+					}
 				}
-			}, 
+			},
+
+			// TODO: Enhance, currently just testing basics...
+			addRelationship: {
+				needs: { id: true, },
+				compute:  function (instance) {
+					let modelClass = instance.getModelClass();
+					let id = instance.id;
+					return  (relname:string, relid:number) => {
+						let res = modelClass.update({
+							where: { id },
+							data: {
+								[relname]: {
+									connect: { id: relid },
+								}
+							}
+						});
+						return res;
+					}
+				}
+			},
+			tstArg: {
+				//compute(instance) {
+				needs: { id: true, },
+				compute: function (instance) {
+					return (it) => {
+						//console.log({ it });
+						return it;
+					}
+				}
+			}
 			/*
 			removeRelation: {
 				needs: { id: true, },
@@ -136,16 +180,6 @@ export async function getPrisma(pextends: GenObj = {}) {
 					return async (rel:string,  
 				}
 			},
-			*/
-			/*
-			tstArg: {
-				compute(instance) {
-					return (it) => {
-						//console.log({ it });
-						return it;
-					}
-				}
-			}
 			*/
 		};
 
@@ -290,7 +324,7 @@ async function addModelNameToAllResults() {
  * }
  */
 //async function addFieldsToAllResults(fieldName:string, fieldDef:GenObj) {
-async function addFieldsToAllResults(fieldDefs:GenObj) {
+async function addFieldsToAllResults(fieldDefs: GenObj) {
 	let modelNames = getModelNames();
 	let res: GenObj = {};
 	let fieldNames = Object.keys(fieldDefs);
@@ -302,7 +336,7 @@ async function addFieldsToAllResults(fieldDefs:GenObj) {
 				res[lcName] = {};
 			}
 			//res[lcName] = { fieldName: fieldDef }; 
-			res[lcName][fieldName] = fieldDef ;
+			res[lcName][fieldName] = fieldDef;
 		}
 	}
 	return { result: res };

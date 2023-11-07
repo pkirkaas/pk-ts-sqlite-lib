@@ -16,16 +16,20 @@ export declare let commonExtends: {
             /**
              * Returns an instance or refreshed instanced based on id, or null
              * So can add include relations if missing from orig result
-             * @param idOrInstance -
+             * @param idOrInstance - a model instance or ID
              * @param string|string[]|GenObj include - relations to include.
              *   string or array of strings to convert into object {[relName]:true}
-          */
+            */
             byId<T_1>(this: T_1, idOrInstance: any, include?: string | string[] | GenObj): Promise<any>;
             getFields(this: any): GenObj;
             getIds<T_2>(this: T_2, where?: Prisma.Args<T_2, "findMany">["where"]): Promise<Number[]>;
         };
     };
 };
+/**
+ * Singleton implementation of PrismaClient, with some default extensions if you want it
+ * Adds some generic methods to all Models & Instances
+ */
 export declare function getPrisma(pextends?: GenObj): Promise<GenObj>;
 /** Returns the model names known to Prisma
  *  Can be Model names or Table names

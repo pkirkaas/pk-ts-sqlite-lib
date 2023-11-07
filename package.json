@@ -23,6 +23,7 @@
     "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.cjs.json",
     "pushdb": "npx prisma db push",
     "seeddb": "npx prisma db seed",
+    "studio": "npx prisma studio",
     "clean": "rm -rf ./dist ./node_modules package-lock.json && npm i"
   },
   "prisma": {
