@@ -4,6 +4,7 @@
 
 import {
 	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable,
+	isNumeric, asNumeric, isSimpleObject,
 
 } from './init.js';
 
@@ -111,8 +112,50 @@ export let commonExtends = { // Common extensions, to merge w. custom
 };
 
 /**
+ * Get just the tableFields of an instance, which may also contain computed fields 
+ * Should be moved into a chain of "extends"
+ * @param model - the Prisma Model
+ * @param instance - the prisma model instance
+ * @param data - Optional - the data to merge 
+ * @return object with just the table values
+ */
+
+export function getMergedData(modelClass, instance, data: GenObj = {}) {
+	let tableFields = Object.keys(modelClass.getFields());
+	let instanceFields = _.pick(instance, tableFields);
+	data = mergeAndConcat(instanceFields, data);
+	return data;
+}
+
+/**
+ * Takes an argument and returns an array of objects of {id:id}
+ * For connect/disconnect/set
+ * @param arg - an integer, array of integers, an object/instance or array of objects with id key
+ * @return {id:id}[]
+ */
+function toIdArray(arg: number | number[] | GenObj | GenObj[]) : GenObj[] {
+	if (!Array.isArray(arg)) {
+		arg = [arg];
+	}
+	let ret = [];
+	// @ts-ignore
+	for (let el of arg) {
+		if (isSimpleObject(el) && el.id) {
+			ret.push({ id: el.id });
+		} else if (isPrimitive(el)) {
+			ret.push({ id: el });
+		} else {
+			throw new PkError(`Invalid arg to [toIdArr] - `, arg, el);
+		}
+	}
+	return ret;
+}
+
+/**
  * Singleton implementation of PrismaClient, with some default extensions if you want it
  * Adds some generic methods to all Models & Instances
+ * Opinionated (primary keys always integers, named id)
+ * Not robust - it's on you
  */
 export async function getPrisma(pextends: GenObj = {}) {
 	if (isEmpty(prisma)) {
@@ -124,15 +167,18 @@ export async function getPrisma(pextends: GenObj = {}) {
 			save: {
 				needs: { id: true, },
 				//compute: async function (instance) {
-				compute:  function (instance) {
+				compute: function (instance) {
 					let modelClass = instance.getModelClass();
 					let id = instance.id;
 					//console.log("Enter save; instance:", { instance });
-					return  (data: GenObj = {}) => {
+					return (data: GenObj = {}) => {
 						// Experiment with this - check edge cases
+						/*
 						let tableFields = Object.keys(modelClass.getFields());
 						let instanceFields = _.pick(instance, tableFields);
 						data = mergeAndConcat(instanceFields, data);
+						*/
+						data = getMergedData(modelClass, instance, data);
 						//console.log({ data, tableFields, instanceFields });
 						let res = modelClass.update({
 							where: { id },
@@ -143,18 +189,22 @@ export async function getPrisma(pextends: GenObj = {}) {
 				}
 			},
 
-			// TODO: Enhance, currently just testing basics...
-			addRelationship: {
+			/**
+			 * Connect a relationship/relationships
+			 * Fragile - depends on calling with appropriate relationship name
+			 */
+			connect: {
 				needs: { id: true, },
-				compute:  function (instance) {
+				compute: function (instance) {
 					let modelClass = instance.getModelClass();
 					let id = instance.id;
-					return  (relname:string, relid:number) => {
+					return (relname: string, rels) => {
+						let relarr = toIdArray(rels);
 						let res = modelClass.update({
 							where: { id },
 							data: {
 								[relname]: {
-									connect: { id: relid },
+									connect: relarr,
 								}
 							}
 						});
@@ -162,6 +212,54 @@ export async function getPrisma(pextends: GenObj = {}) {
 					}
 				}
 			},
+
+			disconnect: {
+				needs: { id: true, },
+				compute: function (instance) {
+					let modelClass = instance.getModelClass();
+					let id = instance.id;
+					return (relname: string, rels) => {
+						let relarr = toIdArray(rels);
+						let res = modelClass.update({
+							where: { id },
+							data: {
+								[relname]: {
+									disconnect: relarr,
+								}
+							}
+						});
+						return res;
+					}
+				}
+			},
+
+
+			set: {
+				needs: { id: true, },
+				compute: function (instance) {
+					let modelClass = instance.getModelClass();
+					let id = instance.id;
+					return (relname: string, rels) => {
+						let relarr = toIdArray(rels);
+						console.log({ relarr });
+						let res = modelClass.update({
+							where: { id },
+							data: {
+								[relname]: {
+									set: relarr,
+								}
+							}
+						});
+						return res;
+					}
+				}
+			},
+
+
+
+
+
+
 			tstArg: {
 				//compute(instance) {
 				needs: { id: true, },

@@ -1,7 +1,7 @@
 /**
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
-import { isObject, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, } from './init.js';
+import { isObject, isPrimitive, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, } from './init.js';
 import _ from "lodash";
 import { Prisma, PrismaClient, } from '@prisma/client';
 export let prisma = {};
@@ -99,8 +99,49 @@ export let commonExtends = {
     },
 };
 /**
+ * Get just the tableFields of an instance, which may also contain computed fields
+ * Should be moved into a chain of "extends"
+ * @param model - the Prisma Model
+ * @param instance - the prisma model instance
+ * @param data - Optional - the data to merge
+ * @return object with just the table values
+ */
+export function getMergedData(modelClass, instance, data = {}) {
+    let tableFields = Object.keys(modelClass.getFields());
+    let instanceFields = _.pick(instance, tableFields);
+    data = mergeAndConcat(instanceFields, data);
+    return data;
+}
+/**
+ * Takes an argument and returns an array of objects of {id:id}
+ * For connect/disconnect/set
+ * @param arg - an integer, array of integers, an object/instance or array of objects with id key
+ * @return {id:id}[]
+ */
+function toIdArray(arg) {
+    if (!Array.isArray(arg)) {
+        arg = [arg];
+    }
+    let ret = [];
+    // @ts-ignore
+    for (let el of arg) {
+        if (isSimpleObject(el) && el.id) {
+            ret.push({ id: el.id });
+        }
+        else if (isPrimitive(el)) {
+            ret.push({ id: el });
+        }
+        else {
+            throw new PkError(`Invalid arg to [toIdArr] - `, arg, el);
+        }
+    }
+    return ret;
+}
+/**
  * Singleton implementation of PrismaClient, with some default extensions if you want it
  * Adds some generic methods to all Models & Instances
+ * Opinionated (primary keys always integers, named id)
+ * Not robust - it's on you
  */
 export async function getPrisma(pextends = {}) {
     if (isEmpty(prisma)) {
@@ -117,9 +158,12 @@ export async function getPrisma(pextends = {}) {
                     //console.log("Enter save; instance:", { instance });
                     return (data = {}) => {
                         // Experiment with this - check edge cases
+                        /*
                         let tableFields = Object.keys(modelClass.getFields());
                         let instanceFields = _.pick(instance, tableFields);
                         data = mergeAndConcat(instanceFields, data);
+                        */
+                        data = getMergedData(modelClass, instance, data);
                         //console.log({ data, tableFields, instanceFields });
                         let res = modelClass.update({
                             where: { id },
@@ -129,18 +173,61 @@ export async function getPrisma(pextends = {}) {
                     };
                 }
             },
-            // TODO: Enhance, currently just testing basics...
-            addRelationship: {
+            /**
+             * Connect a relationship/relationships
+             * Fragile - depends on calling with appropriate relationship name
+             */
+            connect: {
                 needs: { id: true, },
                 compute: function (instance) {
                     let modelClass = instance.getModelClass();
                     let id = instance.id;
-                    return (relname, relid) => {
+                    return (relname, rels) => {
+                        let relarr = toIdArray(rels);
                         let res = modelClass.update({
                             where: { id },
                             data: {
                                 [relname]: {
-                                    connect: { id: relid },
+                                    connect: relarr,
+                                }
+                            }
+                        });
+                        return res;
+                    };
+                }
+            },
+            disconnect: {
+                needs: { id: true, },
+                compute: function (instance) {
+                    let modelClass = instance.getModelClass();
+                    let id = instance.id;
+                    return (relname, rels) => {
+                        let relarr = toIdArray(rels);
+                        let res = modelClass.update({
+                            where: { id },
+                            data: {
+                                [relname]: {
+                                    disconnect: relarr,
+                                }
+                            }
+                        });
+                        return res;
+                    };
+                }
+            },
+            set: {
+                needs: { id: true, },
+                compute: function (instance) {
+                    let modelClass = instance.getModelClass();
+                    let id = instance.id;
+                    return (relname, rels) => {
+                        let relarr = toIdArray(rels);
+                        console.log({ relarr });
+                        let res = modelClass.update({
+                            where: { id },
+                            data: {
+                                [relname]: {
+                                    set: relarr,
                                 }
                             }
                         });

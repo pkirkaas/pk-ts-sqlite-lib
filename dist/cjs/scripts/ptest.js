@@ -42,15 +42,16 @@ let testsFs = {
     },
     async tstUsr() {
         let user = await prisma.user.findFirst();
-        user.name = "AndYouMyPretty";
-        let istst = user.tstArg("A TST STR");
+        user.name = "Koala Days";
         // @ts-ignore
         // @ts-ignore
-        let u2 = await user.save({ email: 'BBBBBCCC@butts.com' });
-        //let u3 = await u2.addRelationship('posts', { id: 61 });
-        let u3 = await u2.addRelationship('posts', 61);
-        let u4 = await u3.addRelationship('posts', 41);
-        await u3.addRelationship('posts', 99);
+        let u2 = await user.save({ email: 'BBBZZZ@butts.com' });
+        //let u3 = await u2.connect('posts', 61 );
+        //let u3 = await u2.set('posts', 41 );
+        let u3 = await u2.disconnect('posts', 41);
+        //let u3 = await u2.addRelationship('posts',  61 );
+        //let u4 = await u3.addRelationship('posts',  41 );
+        //await u3.addRelationship('posts',  99 );
         /*
         let weird = user.tstArg("Some weird String");
         //let ids = await prisma.user.getIds('anarg');
@@ -64,7 +65,7 @@ let testsFs = {
         //let refresh = await prisma.user.byId(user, 'posts');
         let refresh = await prisma.user.byId(user);
         //console.log({ user, u2, u3, ids, weird, refresh });
-        console.log({ user, refresh, istst });
+        console.log({ user, refresh, });
     },
     tstUsrsOld: async function () {
         let pmx = await getPrisma();

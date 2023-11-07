@@ -27,8 +27,19 @@ export declare let commonExtends: {
     };
 };
 /**
+ * Get just the tableFields of an instance, which may also contain computed fields
+ * Should be moved into a chain of "extends"
+ * @param model - the Prisma Model
+ * @param instance - the prisma model instance
+ * @param data - Optional - the data to merge
+ * @return object with just the table values
+ */
+export declare function getMergedData(modelClass: any, instance: any, data?: GenObj): GenObj;
+/**
  * Singleton implementation of PrismaClient, with some default extensions if you want it
  * Adds some generic methods to all Models & Instances
+ * Opinionated (primary keys always integers, named id)
+ * Not robust - it's on you
  */
 export declare function getPrisma(pextends?: GenObj): Promise<GenObj>;
 /** Returns the model names known to Prisma
