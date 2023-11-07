@@ -5,6 +5,35 @@ import { GenObj } from './init.js';
 import { Prisma } from '@prisma/client';
 export declare let prisma: GenObj;
 /**
+ * Returns the hidden dmmf datamodel from Prisma, to get the schema
+ */
+export declare function getDatamodel(lPrisma?: typeof Prisma): any;
+/**
+ * Returns details of model fields, properties, relationships, etc, in friendly form.
+ * @return GenObj of the form:
+ * {
+ *   [ModelName]: {
+ *     allFields: { // All fields, relationship & model fields
+ *       [fieldName] : [fieldSpec]
+ *     },
+ *     modelFields : { // Subset of all fields that are direct - like table fields
+ *       [fieldName] : [fieldSpec]
+ *     },
+ *    relationFields : { //  fields that are relationships -
+ *       [fieldName] : [fieldSpec]
+ *     },
+ *   }
+ * }
+ *
+ * The fieldSpec for relationship fields has:
+ * kind: 'object',
+ * isList: true/false (true for one-to-many or many-to-many
+ * relationpName : "PostToUser",
+ * type: 'Post',
+ *
+ */
+export declare function getSchema(lPrisma?: typeof Prisma): GenObj;
+/**
  * Common enhancements/extensions to prisma client, to be merged
  * with custom extensions per implementing app
  */

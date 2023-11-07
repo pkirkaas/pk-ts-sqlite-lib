@@ -1,10 +1,92 @@
 /**
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
-import { isObject, isPrimitive, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, } from './init.js';
+import { isObject, isPrimitive, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, typeOf, } from './init.js';
 import _ from "lodash";
 import { Prisma, PrismaClient, } from '@prisma/client';
 export let prisma = {};
+/**
+ * Returns the hidden dmmf datamodel from Prisma, to get the schema
+ */
+export function getDatamodel(lPrisma = Prisma) {
+    let aePrisma = asEnumerable(lPrisma);
+    try {
+        return aePrisma?.dmmf?.datamodel;
+    }
+    catch (e) {
+        console.error(`Error in getDatamodel on Prisma`, e);
+        return null;
+    }
+}
+/**
+ * Returns details of model fields, properties, relationships, etc, in friendly form.
+ * @return GenObj of the form:
+ * {
+ *   [ModelName]: {
+ *     allFields: { // All fields, relationship & model fields
+ *       [fieldName] : [fieldSpec]
+ *     },
+ *     modelFields : { // Subset of all fields that are direct - like table fields
+ *       [fieldName] : [fieldSpec]
+ *     },
+ *    relationFields : { //  fields that are relationships -
+ *       [fieldName] : [fieldSpec]
+ *     },
+ *   }
+ * }
+ *
+ * The fieldSpec for relationship fields has:
+ * kind: 'object',
+ * isList: true/false (true for one-to-many or many-to-many
+ * relationpName : "PostToUser",
+ * type: 'Post',
+ *
+ */
+export function getSchema(lPrisma = Prisma) {
+    let datamodel = getDatamodel(lPrisma);
+    let models = datamodel.models;
+    let modelValues = Object.values(models);
+    let toModels = typeOf(models);
+    let toValues = typeOf(modelValues);
+    console.log({ toModels, toValues, });
+    //console.log({  modelValues });
+    // Models are in an array
+    let ret = {};
+    //for (let modelEl of models) { //Each el is an object
+    //for (let modelEl  of Object.values(models) as GenObj[]) { //Each el is an object
+    //for (let modelEl  of modelValues) { //Each el is an object
+    for (let key in models) { //Each el is an object
+        let modelEl = models[key];
+        if (!isObject(modelEl)) {
+            //console.error(`No modelEl! for model key: [${key}]`);
+            continue;
+        }
+        let modelName = modelEl.name;
+        //ret[modelName] = modelEl; //
+        let rawFields = modelEl.fields;
+        let fieldInfo = {};
+        let allFields = {};
+        let modelFields = {};
+        let relationFields = {};
+        //for (let fieldSpec of Object.values(rawFields) as GenObj[]) { // Again, array of field objects
+        for (let fieldKey in rawFields) { // Again, array of field objects
+            let fieldSpec = rawFields[fieldKey];
+            if ((fieldKey === 'undefined') || !isObject(fieldSpec)) {
+                continue;
+            }
+            let fieldName = fieldSpec.name;
+            allFields[fieldName] = fieldSpec;
+            if (fieldSpec.relationName) {
+                relationFields[fieldName] = fieldSpec;
+            }
+            else { //It's a table field? 
+                modelFields[fieldName] = fieldSpec;
+            }
+        }
+        ret[modelName] = { allFields, relationFields, modelFields };
+    }
+    return ret;
+}
 /**
  * Common enhancements/extensions to prisma client, to be merged
  * with custom extensions per implementing app

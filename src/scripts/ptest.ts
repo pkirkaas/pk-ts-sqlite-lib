@@ -5,7 +5,7 @@
 
 import { Prisma, PrismaClient, } from '@prisma/client';
 import {
-	getFilePaths, slashPath, dbgWrt, ask, runCli, sassMapStringToJson, sassMapStringToObj, saveData, isFile, getOsType, isWindows, isLinux, runCommand, stdOut, winBashes,
+	getFilePaths, slashPath, dbgWrt, ask, runCli, sassMapStringToJson, sassMapStringToObj, saveData, isFile, getOsType, isWindows, isLinux, runCommand, stdOut, winBashes, getSchema,
 	getPrisma, allProps, allPropsWithTypes, getProps, asEnumerable,
 } from '../index.js';
 
@@ -16,8 +16,41 @@ import _ from 'lodash';
 import { mergeAndConcat, isEmpty, typeOf } from 'pk-ts-common-lib';
 
 let testsFs = {
+
+	async tstSchema() {
+		await getPrisma();
+		let schema =  getSchema();
+		dbgWrt(schema);
+		console.log({ schema });
+	},
+
+	tstRels: async  function() {
+		let pmx = await getPrisma();
+		let a = 'b';
+		/*
+		let aclient = asEnumerable(prisma, 8);
+		*/
+		let schema = prisma.schema;
+		//let intr = await prisma.introspect();
+		let aePrisma = asEnumerable(Prisma,9);
+		let aeClient = asEnumerable(pmx);
+		
+		//dbgWrt(aclient);
+		//dbgWrt(aePrisma);
+		dbgWrt(aeClient);
+		//console.log({ aclient});
+		console.log({
+			aePrisma,
+			//Prisma,
+		}, `Bye!`);
+		
+},
 	async tstAs() {
 		console.log('Even async tstAs?');
+	},
+	getPstFields: async function() {
+		let pfields = prisma.post.getFields();
+		console.log({ pfields });
 	},
 	tstKey() {
 		console.log("Yes, tstKey works Run!!");
@@ -49,6 +82,11 @@ let testsFs = {
 		let uFields = uModel.getFields();
 		let pFields = pModel.getFields();
 		console.log({ uFields, pFields });
+	},
+	async tstJson() {
+		let user = await prisma.User.findFirst();
+		let userJson = JSON.stringify(user);
+		console.log({ user, userJson });
 	},
 	async tstUsr() {
 		let user = await prisma.user.findFirst();
