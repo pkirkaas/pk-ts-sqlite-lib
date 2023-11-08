@@ -76,12 +76,24 @@ let testsFs = {
         console.log({ user, userJson });
     },
     async tstUsr() {
+        //let user = { well: "Another fine mess..." };
         let user = await prisma.user.findFirst();
+        //let usrModel = asEnumerable(prisma.user,2);
+        //let usrModel = prisma.user;
+        let usrModel = user.getModelClass();
+        let allFields = usrModel.getAllFields(true);
+        let data = { name: "Johnny", email: "J@b.com", pwd: "Nope" };
+        let newUser = await usrModel.create({ data });
+        //dbgWrt(usrModel);
+        console.log({ allFields });
+        //console.log({ usrModel });
+        /*
         user.name = "Koala Nights";
         let u2 = await user.save({ email: 'BBBZZZ@butts.com' });
-        await u2.connect('posts', 44);
-        await u2.connect('posts', 37);
+        await u2.connect('posts', 44 );
+        await u2.connect('posts', 37 );
         u2.pwd = 'abcakbc';
+        */
         //let u3 = await u2.set('posts', [41, 61] );
         //let u3 = await u2.disconnect('posts', 41 );
         //let u3 = await u2.addRelationship('posts',  61 );
@@ -93,10 +105,10 @@ let testsFs = {
         let u2 = await user.save;
         let u3 = await u2.xsave;
         */
-        let refresh = await prisma.user.byId(user, 'posts');
+        //let refresh = await prisma.user.byId(user, 'posts');
         //let refresh = await prisma.user.byId(user);
         //console.log({ user, u2, u3, ids, weird, refresh });
-        console.log({ user, refresh, });
+        //		console.log({ user, refresh, });
     },
     tstUsrsOld: async function () {
         let pmx = await getPrisma();

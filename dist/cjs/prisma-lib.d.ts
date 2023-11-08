@@ -43,6 +43,13 @@ export declare let commonExtends: {
         $allModels: {
             exists<T>(this: T, where: Prisma.Args<T, "findFirst">["where"]): Promise<any>;
             /**
+             * Return the model field specifications as an object,
+             * or just an array of their names
+             */
+            getAllFields(namesOnly?: boolean): any;
+            getModelFields(namesOnly?: boolean): any;
+            getRelationFields(namesOnly?: boolean): any;
+            /**
              * Returns an instance or refreshed instanced based on id, or null
              * So can add include relations if missing from orig result
              * @param idOrInstance - a model instance or ID

@@ -15,6 +15,11 @@ import { Prisma, PrismaClient, } from '@prisma/client';
 export let prisma: GenObj = {};
 
 /**
+ * Singleton for getSchema
+ */
+let schema: GenObj = {};
+
+/**
  * Returns the hidden dmmf datamodel from Prisma, to get the schema
  */
 export  function getDatamodel(lPrisma = Prisma) {
@@ -52,48 +57,51 @@ export  function getDatamodel(lPrisma = Prisma) {
  * 
  */
 export  function getSchema(lPrisma = Prisma) {
-	let datamodel =  getDatamodel(lPrisma);
-	let models = datamodel.models;
-	let modelValues:GenObj[] = Object.values(models);
-	let toModels = typeOf(models);
-	let toValues = typeOf(modelValues);
-	//console.log({ toModels, toValues,  });
-	//console.log({  modelValues });
-	// Models are in an array
-	let ret: GenObj = {};
-	//for (let modelEl of models) { //Each el is an object
-	//for (let modelEl  of Object.values(models) as GenObj[]) { //Each el is an object
-	//for (let modelEl  of modelValues) { //Each el is an object
-	for (let key in models) { //Each el is an object
-		let modelEl = models[key];
-		if (!isObject(modelEl)) {
-			//console.error(`No modelEl! for model key: [${key}]`);
-			continue;
-		}
-		let modelName = modelEl.name;
-		//ret[modelName] = modelEl; //
-		let rawFields = modelEl.fields; 
-		let fieldInfo: GenObj = {};
-		let allFields: GenObj = {};
-		let modelFields: GenObj = {};
-		let relationFields: GenObj = {};
-		//for (let fieldSpec of Object.values(rawFields) as GenObj[]) { // Again, array of field objects
-		for (let fieldKey in rawFields) { // Again, array of field objects
-			let fieldSpec = rawFields[fieldKey];
-			if ((fieldKey === 'undefined') || !isObject(fieldSpec)) {
+	if (isEmpty(schema)) {
+		let datamodel = getDatamodel(lPrisma);
+		let models = datamodel.models;
+		let modelValues: GenObj[] = Object.values(models);
+		let toModels = typeOf(models);
+		let toValues = typeOf(modelValues);
+		//console.log({ toModels, toValues,  });
+		//console.log({  modelValues });
+		// Models are in an array
+		let ret: GenObj = {};
+		//for (let modelEl of models) { //Each el is an object
+		//for (let modelEl  of Object.values(models) as GenObj[]) { //Each el is an object
+		//for (let modelEl  of modelValues) { //Each el is an object
+		for (let key in models) { //Each el is an object
+			let modelEl = models[key];
+			if (!isObject(modelEl)) {
+				//console.error(`No modelEl! for model key: [${key}]`);
 				continue;
 			}
-			let fieldName = fieldSpec.name;
-			allFields[fieldName] =  fieldSpec;
-			if (fieldSpec.relationName) {
-				relationFields[fieldName] = fieldSpec;
-			} else { //It's a table field? 
-				modelFields[fieldName] = fieldSpec;
+			let modelName = modelEl.name;
+			//ret[modelName] = modelEl; //
+			let rawFields = modelEl.fields;
+			let fieldInfo: GenObj = {};
+			let allFields: GenObj = {};
+			let modelFields: GenObj = {};
+			let relationFields: GenObj = {};
+			//for (let fieldSpec of Object.values(rawFields) as GenObj[]) { // Again, array of field objects
+			for (let fieldKey in rawFields) { // Again, array of field objects
+				let fieldSpec = rawFields[fieldKey];
+				if ((fieldKey === 'undefined') || !isObject(fieldSpec)) {
+					continue;
+				}
+				let fieldName = fieldSpec.name;
+				allFields[fieldName] = fieldSpec;
+				if (fieldSpec.relationName) {
+					relationFields[fieldName] = fieldSpec;
+				} else { //It's a table field? 
+					modelFields[fieldName] = fieldSpec;
+				}
 			}
+			ret[modelName] = { allFields, relationFields, modelFields };
 		}
-		ret[modelName] = { allFields, relationFields, modelFields };
+		schema = ret;
 	}
-	return ret;
+	return schema;
 }
 
 /**
@@ -101,6 +109,17 @@ export  function getSchema(lPrisma = Prisma) {
  * with custom extensions per implementing app
  */
 export let commonExtends = { // Common extensions, to merge w. custom 
+	/*
+	query: {
+    $allModels: {
+      $allOperations({ model, operation, args, query }) {
+				console.log(`in Query Extension:`, { model, operation, args, query });
+        // your custom logic for modifying all operations on all models here
+        return query(args)
+      },
+    },
+  },
+	*/
 	result: {
 		/*
 		$allInstances: {
@@ -142,6 +161,43 @@ export let commonExtends = { // Common extensions, to merge w. custom
 				//return result !== null
 				return result; // Null or the instance
 			},
+
+			/**
+			 * Return the model field specifications as an object,
+			 * or just an array of their names
+			 */
+			getAllFields( namesOnly = false) {
+				let lSchema = getSchema();
+				const context = Prisma.getExtensionContext(this)
+				let modelName = context.name;
+				let fieldSpecs = lSchema[modelName]['allFields'];
+				if (namesOnly) {
+					return Object.keys(fieldSpecs);
+				}
+				return fieldSpecs;
+			},
+			getModelFields( namesOnly = false) {
+				let lSchema = getSchema();
+				const context = Prisma.getExtensionContext(this)
+				let modelName = context.name;
+				let fieldSpecs = lSchema[modelName]['modelFields'];
+				if (namesOnly) {
+					return Object.keys(fieldSpecs);
+				}
+				return fieldSpecs;
+			},
+			getRelationFields( namesOnly = false) {
+				let lSchema = getSchema();
+				const context = Prisma.getExtensionContext(this)
+				let modelName = context.name;
+				let fieldSpecs = lSchema[modelName]['relationFields'];
+				if (namesOnly) {
+					return Object.keys(fieldSpecs);
+				}
+				return fieldSpecs;
+			},
+			/*
+			*/
 			/**
 			 * Returns an instance or refreshed instanced based on id, or null
 			 * So can add include relations if missing from orig result
