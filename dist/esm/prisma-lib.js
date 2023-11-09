@@ -93,20 +93,18 @@ export function getSchema(lPrisma = Prisma) {
 export let commonExtends = {
     query: {
         $allModels: {
+            // Convert all keys ending in JSON with object types into JSON strings
             create({ model, operation, args, query }) {
-                console.log(`in Query Extension, before JSONMod:`, { model, operation, args, });
+                //console.log(`in Query Extension, before JSONMod:`, { model, operation, args, });
                 args = stringifyJSONfields(args);
-                console.log(`in Query Extension, AFTER JSONMod:`, { model, operation, args, });
+                //console.log(`in Query Extension, AFTER JSONMod:`, { model, operation, args, });
                 // your custom logic for modifying all operations on all models here
                 return query(args);
             },
-            /*
-            $allOperations({ model, operation, args, query }) {
-                console.log(`in Query Extension:`, { model, operation, args, query });
-                // your custom logic for modifying all operations on all models here
-                return query(args)
+            update({ model, operation, args, query }) {
+                args = stringifyJSONfields(args);
+                return query(args);
             },
-            */
         },
     },
     /*
@@ -304,7 +302,6 @@ export function parseJSONfields(data) {
         let val = data[key];
         //if (key.endsWith('JSON') && isJson5Str(data[key])) {
         if (key.endsWith('JSON') && isJsonStr(data[key])) {
-            //data[key] = JSON5Parse(data[key]);
             data[key] = JSON.parse(data[key]);
         }
         else if (isObject(val)) {
@@ -404,6 +401,18 @@ export async function getPrisma(pextends = {}) {
                     };
                 }
             },
+            parsed: {
+                //compute(instance) {
+                needs: { id: true, },
+                compute: function (instance) {
+                    //console.log(`In pre-parsed, instance:`, { instance });
+                    //instance =  parseJSONfields(instance);
+                    //console.log(`In post-parsed, instance:`, { instance });
+                    return () => {
+                        return parseJSONfields(instance);
+                    };
+                }
+            },
             tstArg: {
                 //compute(instance) {
                 needs: { id: true, },
@@ -412,7 +421,7 @@ export async function getPrisma(pextends = {}) {
                         return it;
                     };
                 }
-            }
+            },
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });
         let tstRes = await addFieldsToAllResults(fieldDefs);

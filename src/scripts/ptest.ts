@@ -88,6 +88,16 @@ let testsFs = {
 		let userJson = JSON.stringify(user);
 		console.log({ user, userJson });
 	},
+	async tstParsed() {
+		let user = await prisma.user.findFirst();
+		console.log({ user });
+
+		let u2 = await user.parsed();
+		u2.tstDataJSON['god'] = "Machine";
+		await u2.save();
+
+		console.log({ u2 });
+	},
 	async tstUsr() {
 		//let user = { well: "Another fine mess..." };
 		let user = await prisma.user.findFirst();

@@ -46,6 +46,12 @@ export declare let commonExtends: {
                 args: any;
                 query: any;
             }): any;
+            update({ model, operation, args, query }: {
+                model: any;
+                operation: any;
+                args: any;
+                query: any;
+            }): any;
         };
     };
     result: {};
