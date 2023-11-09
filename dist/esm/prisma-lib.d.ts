@@ -38,6 +38,16 @@ export declare function getSchema(lPrisma?: typeof Prisma): GenObj;
  * with custom extensions per implementing app
  */
 export declare let commonExtends: {
+    query: {
+        $allModels: {
+            create({ model, operation, args, query }: {
+                model: any;
+                operation: any;
+                args: any;
+                query: any;
+            }): any;
+        };
+    };
     result: {};
     model: {
         $allModels: {
@@ -72,6 +82,33 @@ export declare let commonExtends: {
  */
 export declare function getMergedData(instance: any, data?: GenObj): GenObj;
 /**
+ * Get key field names ending in JSON
+ */
+export declare function getJSONkeys(data: GenObj): string[];
+/**
+ * If data contains keys ending in *JSON, stringify the data value
+ */
+export declare function stringifyJSONfields(data: any): any;
+/**
+ * If data contains keys ending in *JSON, JSON parse the data string value
+ */
+export declare function parseJSONfields(data: any): any;
+/** Orig, non-recursive
+export function parseJSONfields(data) {
+    if (isEmpty(data)) {
+        return data;
+    }
+    let jKeys = getJSONkeys(data);
+    for (let jKey of jKeys) {
+        let val = data[jKey];
+        if (isJson5Str(val)) {
+            data[jKey] = JSON5Parse(data[jKey]);
+        }
+    }
+    return data;
+}
+*/
+/**
  * Singleton implementation of PrismaClient, with some default extensions if you want it
  * Adds some generic methods to all Models & Instances
  * Opinionated (primary keys always integers, named id)
@@ -93,15 +130,12 @@ export declare function getModelIds(modelName: any): Promise<any>;
  *   table name, array of table names, or empty for all
  */
 export declare function clearTables(tables?: any): Promise<void>;
-export declare function addRelated(from: GenObj, to: GenObj): Promise<any>;
 export declare let tableMap: GenObj;
 /**
  * Gets table/field defs from the DB - for mapping JSON data to strings
  */
-export declare function getTableMap(): Promise<GenObj>;
 /**
  * Get a model instance by id.
  * @param include - optional - string, array or object for complex includes
  */
-export declare function getById(model: any, id: any, include?: any): Promise<any>;
 //# sourceMappingURL=prisma-lib.d.ts.map

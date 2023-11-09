@@ -1,7 +1,7 @@
 /**
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
-import { isObject, isPrimitive, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, typeOf, } from './init.js';
+import { isObject, isPrimitive, PkError, isSubset, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, isJsonStr, } from './init.js';
 import _ from "lodash";
 import { Prisma, PrismaClient, } from '@prisma/client';
 export let prisma = {};
@@ -51,15 +51,7 @@ export function getSchema(lPrisma = Prisma) {
         let datamodel = getDatamodel(lPrisma);
         let models = datamodel.models;
         let modelValues = Object.values(models);
-        let toModels = typeOf(models);
-        let toValues = typeOf(modelValues);
-        //console.log({ toModels, toValues,  });
-        //console.log({  modelValues });
-        // Models are in an array
         let ret = {};
-        //for (let modelEl of models) { //Each el is an object
-        //for (let modelEl  of Object.values(models) as GenObj[]) { //Each el is an object
-        //for (let modelEl  of modelValues) { //Each el is an object
         for (let key in models) { //Each el is an object
             let modelEl = models[key];
             if (!isObject(modelEl)) {
@@ -99,46 +91,27 @@ export function getSchema(lPrisma = Prisma) {
  * with custom extensions per implementing app
  */
 export let commonExtends = {
-    /*
     query: {
-    $allModels: {
-      $allOperations({ model, operation, args, query }) {
+        $allModels: {
+            create({ model, operation, args, query }) {
+                console.log(`in Query Extension, before JSONMod:`, { model, operation, args, });
+                args = stringifyJSONfields(args);
+                console.log(`in Query Extension, AFTER JSONMod:`, { model, operation, args, });
+                // your custom logic for modifying all operations on all models here
+                return query(args);
+            },
+            /*
+            $allOperations({ model, operation, args, query }) {
                 console.log(`in Query Extension:`, { model, operation, args, query });
-        // your custom logic for modifying all operations on all models here
-        return query(args)
-      },
-    },
-  },
-    */
-    result: {
-    /*
-    $allInstances: {
-        model: {
-            needs: {},
-            compute(instance) {
-                //const context = Prisma.getExtensionContext(this)
-                return "Not the model";
-            }
-        }
-    },
-    user: {
-        ucname: {
-            needs: {},
-            compute() {
-                return this.name.toUpperCase();
+                // your custom logic for modifying all operations on all models here
+                return query(args)
             },
+            */
         },
-        model: {
-            needs: {},
-            compute(user) {
-                const context = Prisma.getExtensionContext(this)
-                console.log(`in result/model:`, { context, user, that:this});
-                return context.name;
-            },
-        }
-    }
-        */
     },
+    /*
+    */
+    result: {},
     model: {
         $allModels: {
             // Returns first matching instance, else null. Useless but code example
@@ -275,6 +248,87 @@ function toIdArray(arg) {
     return ret;
 }
 /**
+ * Get key field names ending in JSON
+ */
+export function getJSONkeys(data) {
+    let keys = Object.keys(data);
+    let jsonKeys = keys.filter((key) => {
+        return key.endsWith('JSON');
+    });
+    return jsonKeys;
+}
+/**
+ * If data contains keys ending in *JSON, stringify the data value
+ */
+export function stringifyJSONfields(data) {
+    if (isEmpty(data)) {
+        return data;
+    }
+    let keys = Object.keys(data);
+    let jKeys = getJSONkeys(data);
+    for (let key of keys) {
+        let val = data[key];
+        //if (!isEmpty(val) && key.endsWith('JSON') && !isJson5Str(data[key])) {
+        if (!isEmpty(val) && key.endsWith('JSON') && !isJsonStr(data[key])) {
+            //data[key] = JSON5Stringify(data[key]);
+            data[key] = JSON.stringify(data[key]);
+        }
+        else if (isObject(val)) {
+            data[key] = stringifyJSONfields(data[key]);
+            //data[key] = JSON5Stringify(data[key]);
+        }
+        /*
+        for (let jKey of jKeys) {
+            let val = data[jKey];
+            if (!isJson5Str(val)) {
+                data[jKey] = JSON5Stringify(data[jKey]);
+            }
+            */
+        /*
+        if (typeof val !== 'string') {
+            data[jKey] = JSON.stringify(data[jKey]);
+        }
+        */
+    }
+    return data;
+}
+/**
+ * If data contains keys ending in *JSON, JSON parse the data string value
+ */
+export function parseJSONfields(data) {
+    if (isEmpty(data)) {
+        return data;
+    }
+    let keys = Object.keys(data);
+    for (let key of keys) {
+        let val = data[key];
+        //if (key.endsWith('JSON') && isJson5Str(data[key])) {
+        if (key.endsWith('JSON') && isJsonStr(data[key])) {
+            //data[key] = JSON5Parse(data[key]);
+            data[key] = JSON.parse(data[key]);
+        }
+        else if (isObject(val)) {
+            data[key] = parseJSONfields(data[key]);
+        }
+    }
+    return data;
+}
+/** Orig, non-recursive
+export function parseJSONfields(data) {
+    if (isEmpty(data)) {
+        return data;
+    }
+    let jKeys = getJSONkeys(data);
+    for (let jKey of jKeys) {
+        let val = data[jKey];
+        if (isJson5Str(val)) {
+            data[jKey] = JSON5Parse(data[jKey]);
+        }
+    }
+    return data;
+}
+*/
+/**
  * Singleton implementation of PrismaClient, with some default extensions if you want it
  * Adds some generic methods to all Models & Instances
  * Opinionated (primary keys always integers, named id)
@@ -310,6 +364,8 @@ export async function getPrisma(pextends = {}) {
                     return (data = {}) => {
                         // Experiment with this - check edge cases
                         data = getMergedData(instance, data);
+                        //EXPERIMENT TO CONVERT fields with xxxJSON to JSON stringify
+                        let dataKeys = Object.keys(data);
                         //console.log({ data, tableFields, instanceFields });
                         let res = modelClass.update({
                             where: { id },
@@ -345,22 +401,6 @@ export async function getPrisma(pextends = {}) {
                 compute: function (instance) {
                     return (relname, rels) => {
                         return mkRelUpdate(instance, relname, rels, 'set');
-                        /*
-                        let modelClass = instance.getModelClass();
-                        let id = instance.id;
-                        return (relname: string, rels) => {
-                            let relarr = toIdArray(rels);
-                            console.log({ relarr });
-                            let res = modelClass.update({
-                                where: { id },
-                                data: {
-                                    [relname]: {
-                                        set: relarr,
-                                    }
-                                }
-                            });
-                            return res;
-                            */
                     };
                 }
             },
@@ -369,7 +409,6 @@ export async function getPrisma(pextends = {}) {
                 needs: { id: true, },
                 compute: function (instance) {
                     return (it) => {
-                        //console.log({ it });
                         return it;
                     };
                 }
@@ -377,7 +416,6 @@ export async function getPrisma(pextends = {}) {
         };
         //let tstRes = await addFieldsToAllResults({ silly: fieldDef });
         let tstRes = await addFieldsToAllResults(fieldDefs);
-        //console.log({ tstRes, fieldDefs });
         let resExtensions = await addModelNameToAllResults();
         commonExtends.result = mergeAndConcat(commonExtends.result, resExtensions);
         let mExtends = mergeAndConcat(commonExtends, pextends);
@@ -417,10 +455,6 @@ export async function clearTables(tables) {
     if (tables && !Array.isArray(tables)) {
         tables = [tables];
     }
-    /*
-    let tableMap = await getTableMap();
-    let tableNames = Object.keys(tableMap);
-    */
     let tableNames = getModelNames();
     if (!tables) {
         tables = tableNames;
@@ -440,29 +474,6 @@ export async function clearTables(tables) {
         }
     }
 }
-export async function addRelated(from, to) {
-    let fromName = from.model;
-    let toName = to.model;
-    let toNameId = toName + 'Id';
-    let updateQuery = {
-        where: { id: from.id },
-        data: {
-            [toNameId]: to.id,
-        }
-    };
-    let updateQuery2 = {
-        where: { id: from.id },
-        data: {
-            [toName]: {
-                connect: [{ id: to.id }],
-            }
-        }
-    };
-    //console.log(`Executing update query on [${fromName}]:`, { updateQuery });
-    //@ts-ignore
-    let res = await prisma[fromName].update(updateQuery);
-    return res;
-}
 /**
  * Gotta be a better way - but adds modelName & lcModelName to all results
  * @return object to be merged to result key of $extends
@@ -473,7 +484,6 @@ async function addModelNameToAllResults() {
     for (let name of modelNames) {
         let lcName = name.toLowerCase();
         res[lcName] = {
-            //res[name] = {
             modelName: {
                 needs: {},
                 compute() {
@@ -554,19 +564,20 @@ export let tableMap = {};
 /**
  * Gets table/field defs from the DB - for mapping JSON data to strings
  */
+/*
 export async function getTableMap() {
     if (isEmpty(tableMap)) {
         let systbles = ['sqlite_sequence', '_prisma_migrations',];
         let nonFields = ['CONSTRAINT', 'CREATE'];
-        let schme = await prisma.$queryRawUnsafe('SELECT * FROM sqlite_schema');
-        let tables = {};
+        let schme: GenObj[] = await prisma.$queryRawUnsafe('SELECT * FROM sqlite_schema');
+        let tables: GenObj = {};
         for (let ent of schme) {
             if ((ent.type !== 'table') || systbles.includes(ent.name)) {
                 continue;
             }
             let sql = ent.sql;
             let sqlArr = sql.split('\n');
-            let fieldMap = {};
+            let fieldMap: GenObj = {};
             for (let fieldDef of sqlArr) {
                 if (strIncludesAny(fieldDef, nonFields) || (fieldDef === ')')) {
                     continue;
@@ -586,15 +597,16 @@ export async function getTableMap() {
         tableMap = tables;
     }
     return tableMap;
-}
-;
+};
+*/
 /**
  * Get a model instance by id.
  * @param include - optional - string, array or object for complex includes
  */
-export async function getById(model, id, include = null) {
+/*
+export async function getById(model, id, include: any = null) {
     id = parseInt(id);
-    let query = { where: { id } };
+    let query: GenObj = { where: { id } };
     let origInclude = include;
     //console.log("Entery getById - include:", { include });
     if (include) {
@@ -618,7 +630,37 @@ export async function getById(model, id, include = null) {
         query.include = include.include;
     }
     //console.log('Debugging getById include:', { include, query });
+
     //@ts-ignore
     return await prisma[model].findUnique(query);
 }
+*/
+/*
+export async function addRelated(from: GenObj, to: GenObj) {
+    let fromName = from.model;
+    let toName = to.model;
+    let toNameId = toName + 'Id';
+    let updateQuery =
+    {
+        where: { id: from.id },
+        data: {
+            [toNameId]: to.id,
+        }
+    };
+
+    let updateQuery2 =
+    {
+        where: { id: from.id },
+        data: {
+            [toName]: {
+                connect: [{ id: to.id }],
+            }
+        }
+    };
+    //console.log(`Executing update query on [${fromName}]:`, { updateQuery });
+    //@ts-ignore
+    let res = await prisma[fromName].update(updateQuery);
+    return res;
+}
+*/
 //# sourceMappingURL=prisma-lib.js.map

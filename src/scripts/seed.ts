@@ -3,9 +3,15 @@
  * Use faker, etc to generate data
  */
 import { Prisma, PrismaClient } from '@prisma/client'
+
 import {
-	getPrisma, clearTables,
+	getPrisma, clearTables, runCli,
+	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable,
+	isNumeric, asNumeric, isSimpleObject, dbgWrt,  JSON5Stringify, JSON5Parse,
+	isJson5Str, isJsonStr,stringifyJSONfields, parseJSONfields, jsonClone,
+
 } from '../init.js';
+
 import { faker } from '@faker-js/faker';
 
 let usrCnt = 8;
@@ -20,6 +26,7 @@ function mkPostData(cnt = pstCnt) {
 			published: true,
 			title: faker.company.catchPhrase(),
 			content:faker.lorem.paragraph(), 
+			postJSON: { post: "More JSON" },
 		});
 	}
 	return data;
@@ -32,6 +39,7 @@ function mkUsrData(cnt = usrCnt) {
 			name: faker.person.firstName(),
 			email: faker.internet.email(),
 			pwd: 'tstpwd',
+			tstDataJSON: { good: "day" },
 			posts: { create: mkPostData() },
 
 		});
@@ -52,6 +60,16 @@ async function mkUsers(cnt = usrCnt) {
 /** New main seed
  * 
  */
+
+async function tstJson() {
+	let usrData = mkUsrData(3);
+	let origData = jsonClone(usrData);
+	let parsedData = stringifyJSONfields(usrData);
+	//dbgWrt({ usrData, origData, parsedData });
+	dbgWrt({  parsedData });
+	console.log({ origData, parsedData });
+
+}
 async function main() {
 	try {
 		await clearTables();
@@ -112,4 +130,15 @@ async function mainOrig() {
 
 }
 
-await main();
+let tstFncs = {
+	main: function() {
+		return main();
+	},
+	tstJson: function () {
+		return tstJson();
+	},
+};
+//await main();
+//await tstJson();
+
+runCli(tstFncs);
