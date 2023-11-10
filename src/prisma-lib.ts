@@ -5,7 +5,7 @@
 import {
 	isObject, dtFmt, isPrimitive, GenObj, PkError, isSubset, strIncludesAny, isEmpty, mergeAndConcat, asEnumerable,
 	isNumeric, asNumeric, isSimpleObject, dbgWrt, typeOf, JSON5Stringify, JSON5Parse,
-	isJson5Str, isJsonStr, JSON5,
+	isJson5Str, isJsonStr, JSON5, keysToJson, keysFromJson,
 
 } from './init.js';
 
@@ -107,13 +107,15 @@ export let commonExtends = { // Common extensions, to merge w. custom
 			// Convert all keys ending in JSON with object types into JSON strings
 			create({ model, operation, args, query }) {
 				//console.log(`in Query Extension, before JSONMod:`, { model, operation, args, });
-				args = stringifyJSONfields(args);
+				//args = stringifyJSONfields(args);
+				args = keysToJson(args);
 				//console.log(`in Query Extension, AFTER JSONMod:`, { model, operation, args, });
 				// your custom logic for modifying all operations on all models here
 				return query(args)
 			},
 			update({ model, operation, args, query }) {
-				args = stringifyJSONfields(args);
+				//args = stringifyJSONfields(args);
+				args = keysToJson(args);
 				return query(args)
 			},
 			/*
@@ -147,10 +149,13 @@ export let commonExtends = { // Common extensions, to merge w. custom
 			async findManyParsed<T>(this: T, args: GenObj): Promise<any> {
 				const context = Prisma.getExtensionContext(this)
 				let res = await (context as any).findMany(args);
+				res = keysFromJson(res);
+				/*
 				let ret = res.map((el) => {
 					return el.parsed();
 				});
-				return ret;
+				*/
+				return res;
 			},
 
 			/**
@@ -461,7 +466,8 @@ export async function getPrisma(pextends: GenObj = {}) {
 					//instance =  parseJSONfields(instance);
 					//console.log(`In post-parsed, instance:`, { instance });
 					return () => {
-						return parseJSONfields(instance);
+						//return parseJSONfields(instance);
+						return keysFromJson(instance);
 					}
 				}
 			},

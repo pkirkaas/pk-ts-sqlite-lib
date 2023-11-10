@@ -84,9 +84,24 @@ let testsFs = {
 		console.log({ uFields, pFields });
 	},
 	async tstJson() {
+		let pendingUser =  prisma.User.findFirst();
+
+		let puProps = allProps(pendingUser, 'tpv', 6);
+		dbgWrt(puProps, 'puProps');
+		let puAe = asEnumerable(pendingUser);
+		let toPU = typeOf(pendingUser);
+		 
 		let user = await prisma.User.findFirst();
-		let userJson = JSON.stringify(user);
-		console.log({ user, userJson });
+		let pUser = user.parsed();
+		//let userJson = JSON.stringify(user);
+		console.log({
+			user,
+			pUser,
+			toPU,
+			pendingUser,
+			puAe,
+			//userJson
+		});
 	},
 	async tstManyParsed() {
 		let posts = await prisma.post.findManyParsed();

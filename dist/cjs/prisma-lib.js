@@ -1,7 +1,7 @@
 /**
  * Prisma support functions - but to use, need to set up prisma in the implementing app
  */
-import { isObject, isPrimitive, PkError, isSubset, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, isJsonStr, } from './init.js';
+import { isObject, isPrimitive, PkError, isSubset, isEmpty, mergeAndConcat, asEnumerable, isSimpleObject, isJsonStr, keysToJson, keysFromJson, } from './init.js';
 import _ from "lodash";
 import { Prisma, PrismaClient, } from '@prisma/client';
 export let prisma = {};
@@ -96,13 +96,15 @@ export let commonExtends = {
             // Convert all keys ending in JSON with object types into JSON strings
             create({ model, operation, args, query }) {
                 //console.log(`in Query Extension, before JSONMod:`, { model, operation, args, });
-                args = stringifyJSONfields(args);
+                //args = stringifyJSONfields(args);
+                args = keysToJson(args);
                 //console.log(`in Query Extension, AFTER JSONMod:`, { model, operation, args, });
                 // your custom logic for modifying all operations on all models here
                 return query(args);
             },
             update({ model, operation, args, query }) {
-                args = stringifyJSONfields(args);
+                //args = stringifyJSONfields(args);
+                args = keysToJson(args);
                 return query(args);
             },
             /*
@@ -134,10 +136,13 @@ export let commonExtends = {
             async findManyParsed(args) {
                 const context = Prisma.getExtensionContext(this);
                 let res = await context.findMany(args);
+                res = keysFromJson(res);
+                /*
                 let ret = res.map((el) => {
                     return el.parsed();
                 });
-                return ret;
+                */
+                return res;
             },
             /**
              * Return the model field specifications as an object,
@@ -426,7 +431,8 @@ export async function getPrisma(pextends = {}) {
                     //instance =  parseJSONfields(instance);
                     //console.log(`In post-parsed, instance:`, { instance });
                     return () => {
-                        return parseJSONfields(instance);
+                        //return parseJSONfields(instance);
+                        return keysFromJson(instance);
                     };
                 }
             },
