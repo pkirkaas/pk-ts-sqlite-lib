@@ -52,6 +52,18 @@ export declare let commonExtends: {
                 args: any;
                 query: any;
             }): any;
+            findMany({ model, operation, args, query }: {
+                model: any;
+                operation: any;
+                args: any;
+                query: any;
+            }): any;
+            findFirst({ model, operation, args, query }: {
+                model: any;
+                operation: any;
+                args: any;
+                query: any;
+            }): any;
         };
     };
     result: {};

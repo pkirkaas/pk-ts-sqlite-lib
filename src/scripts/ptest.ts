@@ -83,6 +83,13 @@ let testsFs = {
 		let pFields = pModel.getFields();
 		console.log({ uFields, pFields });
 	},
+	async tstPromise() {
+		let user = await prisma.User.findFirst();
+		let posts = await prisma.Post.findMany();
+		dbgWrt(posts, 'posts');
+		
+		console.log({ posts });
+	},
 	async tstJson() {
 		let pendingUser =  prisma.User.findFirst();
 

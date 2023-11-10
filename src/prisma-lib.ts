@@ -106,24 +106,24 @@ export let commonExtends = { // Common extensions, to merge w. custom
 		$allModels: {
 			// Convert all keys ending in JSON with object types into JSON strings
 			create({ model, operation, args, query }) {
-				//console.log(`in Query Extension, before JSONMod:`, { model, operation, args, });
-				//args = stringifyJSONfields(args);
 				args = keysToJson(args);
-				//console.log(`in Query Extension, AFTER JSONMod:`, { model, operation, args, });
-				// your custom logic for modifying all operations on all models here
 				return query(args)
 			},
 			update({ model, operation, args, query }) {
-				//args = stringifyJSONfields(args);
 				args = keysToJson(args);
 				return query(args)
 			},
-			/*
+
 			findMany({ model, operation, args, query }) {
-				console.log(`in query findMany, args:`, { args });
-				return query(args)
+				return query(args).then((res) => {
+					return keysFromJson(res);
+				});
 			},
-			*/
+			findFirst({ model, operation, args, query }) {
+				return query(args).then((res) => {
+					return keysFromJson(res);
+				});
+			},
 		},
 	},
 	/*
