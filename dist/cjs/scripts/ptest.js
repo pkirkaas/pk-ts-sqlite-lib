@@ -75,8 +75,12 @@ let testsFs = {
         let userJson = JSON.stringify(user);
         console.log({ user, userJson });
     },
+    async tstManyParsed() {
+        let posts = await prisma.post.findManyParsed();
+        console.log({ posts });
+    },
     async tstParsed() {
-        let user = await prisma.user.findFirst();
+        let user = await prisma.user.findFirst({ include: { posts: true } });
         console.log({ user });
         let u2 = await user.parsed();
         u2.tstDataJSON['god'] = "Machine";

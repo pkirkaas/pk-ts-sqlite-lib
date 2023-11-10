@@ -58,6 +58,10 @@ export declare let commonExtends: {
     model: {
         $allModels: {
             exists<T>(this: T, where: Prisma.Args<T, "findFirst">["where"]): Promise<any>;
+            /**  Returns the findMany query with JSON string fields parsed to Objects
+             * NOT chainable because awaits
+             */
+            findManyParsed<T_1>(this: T_1, args: GenObj): Promise<any>;
             /**
              * Return the model field specifications as an object,
              * or just an array of their names
@@ -72,9 +76,9 @@ export declare let commonExtends: {
              * @param string|string[]|GenObj include - relations to include.
              *   string or array of strings to convert into object {[relName]:true}
             */
-            byId<T_1>(this: T_1, idOrInstance: any, include?: string | string[] | GenObj): Promise<any>;
+            byId<T_2>(this: T_2, idOrInstance: any, include?: string | string[] | GenObj): Promise<any>;
             getFields(this: any): GenObj;
-            getIds<T_2>(this: T_2, where?: Prisma.Args<T_2, "findMany">["where"]): Promise<Number[]>;
+            getIds<T_3>(this: T_3, where?: Prisma.Args<T_3, "findMany">["where"]): Promise<Number[]>;
         };
     };
 };

@@ -105,6 +105,12 @@ export let commonExtends = {
                 args = stringifyJSONfields(args);
                 return query(args);
             },
+            /*
+            findMany({ model, operation, args, query }) {
+                console.log(`in query findMany, args:`, { args });
+                return query(args)
+            },
+            */
         },
     },
     /*
@@ -121,6 +127,17 @@ export let commonExtends = {
                 const result = context.findFirst({ where });
                 //return result !== null
                 return result; // Null or the instance
+            },
+            /**  Returns the findMany query with JSON string fields parsed to Objects
+             * NOT chainable because awaits
+             */
+            async findManyParsed(args) {
+                const context = Prisma.getExtensionContext(this);
+                let res = await context.findMany(args);
+                let ret = res.map((el) => {
+                    return el.parsed();
+                });
+                return ret;
             },
             /**
              * Return the model field specifications as an object,
