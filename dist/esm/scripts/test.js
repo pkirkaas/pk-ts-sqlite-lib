@@ -5,8 +5,8 @@ import { openDb, createTbl } from '../index.js';
 const tblName = `tstTbl`;
 const cdefs = {
     name: 'string not null',
-    yrs_exp_gen: 'int not null',
-    yrs_exp_sig: 'int not null',
+    yrs_exp_gen: 'int not null', // Years experience general
+    yrs_exp_sig: 'int not null', //  Years experience 
     skill: 'string',
     email: 'string',
 };
