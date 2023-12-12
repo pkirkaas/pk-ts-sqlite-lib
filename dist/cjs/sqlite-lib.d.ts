@@ -22,4 +22,12 @@ export declare function openDb(filename?: string): Promise<import("sqlite").Data
  */
 export declare function createTbl(db: any, tblName: string, colDefs: ColDef): Promise<any>;
 export declare function tableExists(db: any, tblName: any): Promise<unknown>;
-//# sourceMappingURL=db-lib.d.ts.map
+/** system tables */
+export declare const sqlite_systables: string[];
+/** Return all table names */
+export declare function getSqliteTables(dbName?: string): Promise<any[]>;
+/**
+ * JUST FOR DEV - DANGEROUS!
+ */
+export declare function emptySqliteTables(dbName?: string): Promise<void>;
+//# sourceMappingURL=sqlite-lib.d.ts.map

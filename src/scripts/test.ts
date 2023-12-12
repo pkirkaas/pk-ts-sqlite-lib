@@ -2,7 +2,7 @@
  * Tests for pk-ts-sqlite-lib
  */
 
-import { openDb, tableExists, createTbl, ColDef } from '../index.js';
+import { openDb, tableExists, createTbl, ColDef, getSqliteTables, runCli, emptySqliteTables, } from '../index.js';
 
 const tblName = `tstTbl`;
 const cdefs: ColDef = {
@@ -18,6 +18,34 @@ let iStr = `INSERT INTO ${tblName} ( name, skill, yrs_exp_gen, yrs_exp_sig, emai
 
 let tQ = `SELECT * FROM ${tblName}`;
 
+let tstFncs = {
+	here: async () => {
+		console.log("Here in tst");
+	},
+
+	getTbls: async () => {
+		let tbls = await getSqliteTables();
+		//let tblKeys = Object.keys(tbls);
+		//let tblVals = Object.values(tbls);
+		//console.log("GetTables", { tbls, tblKeys, tblVals });
+		console.log("GetTables", { tbls,});
+	},
+
+	mkTbl: async () => {
+		const db = await openDb();
+		await createTbl(db, tblName, cdefs);
+		let iRes = await db.exec(iStr);
+		let res = await db.all(tQ);
+		console.log({ res });
+	},
+
+	emptyTbls: async () => {
+		let done = await emptySqliteTables();
+	},
+
+};
+
+/*
 await (async () => {
 	const db = await openDb();
 	await createTbl(db, tblName, cdefs);
@@ -25,17 +53,7 @@ await (async () => {
 	let res = await db.all(tQ);
 	console.log({ res });
 	//let te = await tableExists(db, tblName);
-	/*
-	let te = await tableExists(db, 'kaka');
-	console.log({ te });
-	let aTbl = await db.exec(ctblStr);
-	console.log({ aTbl });
-
-	let iRes = await db.exec(iStr);
-	console.log({ iRes });
-	let res = await db.all(tQ);
-	console.log({ res });
-	*/
-
-
 })();
+*/
+
+runCli(tstFncs);

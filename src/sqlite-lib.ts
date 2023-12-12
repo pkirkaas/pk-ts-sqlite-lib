@@ -3,7 +3,7 @@
  * Paul Kirkaas, March 2023
  */
 
-import { isEmpty, isObject, slashPath, PkError, isFile, } from './index.js';
+import { isEmpty, typeOf, isObject, slashPath, PkError, isFile, } from './index.js';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import path from 'path';
@@ -78,4 +78,56 @@ export async function tableExists(db, tblName) {
 		return false;
 	}
 	return vals[0];
+}
+
+
+/** system tables */
+export const sqlite_systables = [
+	'sqlite_sequence',
+];
+/** Return all table names */
+export async function getSqliteTables(dbName?:string) {
+	if (!dbName) {
+		dbName = process.env.SQLITE_DB;
+	}
+	if (!dbName) {
+		throw new PkError(`No fileName found in openDb`);
+	}
+	if ((dbName !== ':memory') && !path.isAbsolute(dbName)) {
+		dbName = slashPath(process.cwd(), dbName);
+	}
+	let db = await openDb(dbName);
+	// Confirm which to query for tables  'sqlite_schema',  'sqlite_sequence' 'sqlite_master', 
+	let teStr2 = `  SELECT * FROM 'sqlite_master' WHERE type='table' `;
+	let tables = await db.all(teStr2);
+	let tNames = [];
+	for (const tn of tables) {
+		let tName = tn.name;
+		if (!sqlite_systables.includes(tName)) {
+			tNames.push(tName);
+		}
+	}
+	return tNames;
+}
+
+
+/**
+ * JUST FOR DEV - DANGEROUS! 
+ */
+export async function emptySqliteTables(dbName?: string) {
+	if (!dbName) {
+		dbName = process.env.SQLITE_DB;
+	}
+	if (!dbName) {
+		throw new PkError(`No fileName found in openDb`);
+	}
+	if ((dbName !== ':memory') && !path.isAbsolute(dbName)) {
+		dbName = slashPath(process.cwd(), dbName);
+	}
+	let db = await openDb(dbName);
+	let tbls = await getSqliteTables(dbName);
+	for (let tblName of tbls) {
+		let delStr = `DELETE FROM '${tblName}';`;
+		await db.exec(delStr);
+	}
 }
