@@ -13,8 +13,15 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
+    "./typeorm": {
+      "types": "./dist/esm/typeorm/index.d.ts",
+      "default": "./dist/cjs/typeorm/index.js",
+      "import": "./dist/esm/typeorm/index.js",
+      "require": "./dist/cjs/typeorm/index.js"
+    },
     "./tsconfig.cjs.json": "./tsconfig.cjs.json",
-    "./tsconfig.json": "./tsconfig.json"
+    "./tsconfig.json": "./tsconfig.json",
+    "./package.json" : "./package.json"
   },
   "engines": {
     "node": ">= 18.0.0"
