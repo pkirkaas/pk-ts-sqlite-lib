@@ -7,7 +7,7 @@ import { Prisma, PrismaClient, } from '@prisma/client';
 import {
 	getFilePaths, slashPath, dbgWrt, ask, runCli, sassMapStringToJson, sassMapStringToObj, saveData, isFile, getOsType, isWindows, isLinux, runCommand, stdOut, winBashes, getSchema,
 	getPrisma, allProps, allPropsWithTypes, getProps, asEnumerable,
-} from '../index.js';
+} from '../prisma/index.js';
 
 let prisma = await getPrisma();
 

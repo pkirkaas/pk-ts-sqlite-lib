@@ -10,7 +10,7 @@ import {
 	isNumeric, asNumeric, isSimpleObject, dbgWrt,  JSON5Stringify, JSON5Parse,
 	isJson5Str, isJsonStr,keysToJson, keysFromJson, stringifyJSONfields, parseJSONfields, jsonClone,
 
-} from '../init.js';
+} from '../prisma/index.js';
 
 import { faker } from '@faker-js/faker';
 

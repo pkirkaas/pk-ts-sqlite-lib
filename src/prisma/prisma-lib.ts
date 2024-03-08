@@ -7,7 +7,7 @@ import {
 	isNumeric, asNumeric, isSimpleObject, dbgWrt, typeOf, JSON5Stringify, JSON5Parse,
 	isJson5Str, isJsonStr, JSON5, keysToJson, keysFromJson,
 
-} from './init.js';
+} from '../init.js';
 
 import _ from "lodash";
 
