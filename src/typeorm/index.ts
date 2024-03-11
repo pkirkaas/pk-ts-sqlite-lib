@@ -5,3 +5,4 @@
 import "reflect-metadata";
 export * from '../init.js';
 export * from './typeorm-lib.js';
+export * from 'typeorm';

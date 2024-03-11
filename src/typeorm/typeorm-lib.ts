@@ -41,6 +41,33 @@ export async function getToDataSource(ToConfig:GenObj = {}) {
   return AppDataSource;
 }
 
+/**
+ * ONLY FOR TEST/DEV !!!!
+ * DELETES ALL EXISTING ENTITIES FROM DB!!!
+ * Then creates new entities from the config entities key
+ * @param ToConfig 
+ * @returns empty, initialized datasource
+ */
+export async function resetToDataSource(ToConfig:GenObj = {}) {
+  let config:DataSourceOptions = {...defaultToConfig, ...ToConfig};
+  let lentities = config.entities;
+  // @ts-ignore
+  config.entities = [];
+  if (AppDataSource === null) {
+    console.log(`Trying to initialze DA w.`, {config});
+    AppDataSource = new DataSource(config);
+    await AppDataSource.initialize();
+    await AppDataSource.synchronize(true);
+    await AppDataSource.destroy();
+    AppDataSource.setOptions({entities:lentities});
+    await AppDataSource.initialize();
+  }
+  if (!AppDataSource.isInitialized) {
+    throw new PkError("TO DataSource not initialized, w. config:", {config});
+  }
+
+  return AppDataSource;
+}
 //export const AppDataSource = new DataSource(getTOConfig());
 
 //await AppDataSource.initialize();
