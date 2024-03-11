@@ -6,6 +6,7 @@ import { PkBaseEntity } from '../typeorm/index.js';
 export declare class User extends PkBaseEntity {
     email: string;
     firstName: string;
+    udata: any;
     pwd: string;
     posts: Post[];
 }

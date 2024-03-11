@@ -57,6 +57,19 @@ let fncs = {
     console.log({res});
   },
 
+  async tstQ(opt = null) {
+    console.log(`Tst Query, opt: ${opt}`);
+    let ds = await getToDataSource(entities);
+    // Doesn't work w/o entities: let ds = await getToDataSource();
+    let usrRepo = await ds.getRepository(User);
+    let users = await usrRepo.find({
+      where: {
+        //firstName:'Ceasar',
+        udata : {intKey:1},
+      }
+    });
+    console.log({users});
+  },
 
   async tstDriver() {
 		let toDS = typeOf(AppDataSource);

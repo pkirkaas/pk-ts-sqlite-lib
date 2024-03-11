@@ -22,6 +22,8 @@ import { faker } from '@faker-js/faker';
 @Entity() export class User extends PkBaseEntity {
 	@Column({ unique: true, }) email: string;
 	@Column() firstName: string;
+	//@Column("simple-json") udata;
+	@Column({nullable:true, type:"json"}) udata;
 	@Column({ nullable: true }) pwd: string;
 	@OneToMany(() => Post, (post) => post.user) posts: Post[];
 }
@@ -75,6 +77,7 @@ export function mkUserData(cnt = 4) {
 		firstName: "Paul",
 		email: "p@b.com",
 		pwd: "abcd",
+		udata: {akey:"astr", intKey: 9,},
 		posts: [
 			//{ title: "My First Post Title", content: "My First Post Content in Data", },
 			Post.create({ title: "My First Post Title", content: "My First Post Content in Data", }),
@@ -87,6 +90,7 @@ export function mkUserData(cnt = 4) {
 			firstName: faker.person.firstName(),
 			email: faker.internet.email(),
 			pwd: 'tstpwd3',
+			udata: {strKey:"Here", intKey:i},
 	//		detailsJSON: { somDetails: faker.company.name() },
 	//		posts: { create: mkPostData() },
 

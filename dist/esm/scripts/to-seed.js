@@ -27,6 +27,10 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([
+    Column({ nullable: true, type: "json" }),
+    __metadata("design:type", Object)
+], User.prototype, "udata", void 0);
+__decorate([
     Column({ nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "pwd", void 0);
@@ -94,6 +98,7 @@ export function mkUserData(cnt = 4) {
         firstName: "Paul",
         email: "p@b.com",
         pwd: "abcd",
+        udata: { akey: "astr", intKey: 9, },
         posts: [
             //{ title: "My First Post Title", content: "My First Post Content in Data", },
             Post.create({ title: "My First Post Title", content: "My First Post Content in Data", }),
@@ -106,6 +111,7 @@ export function mkUserData(cnt = 4) {
             firstName: faker.person.firstName(),
             email: faker.internet.email(),
             pwd: 'tstpwd3',
+            udata: { strKey: "Here", intKey: i },
             //		detailsJSON: { somDetails: faker.company.name() },
             //		posts: { create: mkPostData() },
         });
