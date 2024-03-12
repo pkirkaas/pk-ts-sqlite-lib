@@ -47,10 +47,36 @@ let fncs = {
         let usrRepo = await ds.getRepository(User);
         let users = await usrRepo.find({
             where: {
-                //firstName:'Ceasar',
-                udata: { intKey: 1 },
+                firstName: 'Ceasar',
+                //udata : {intKey:1},
             }
         });
+        console.log({ users });
+    },
+    async tstQB(opt = null) {
+        console.log(`Tst Query Builder, opt: ${opt}`);
+        let ds = await getToDataSource(entities);
+        // Doesn't work w/o entities: let ds = await getToDataSource();
+        let usrRepo = await ds.getRepository(User);
+        let uQb = usrRepo.createQueryBuilder('user');
+        let users = await uQb.where(
+        //'user.firstName = :fname', {fname:'Ceasar'}).getMany();
+        /* THIS WORKS !!!
+        "json_extract(`udata`, :path) = :val", {
+    path: `$.intKey`,
+    val: 9
+  }
+    */
+        "udata->>'$.intKey' = :val", { val: 2 })
+            .getMany();
+        /*
+        let users = await usrRepo.find({
+          where: {
+            firstName:'Ceasar',
+            //udata : {intKey:1},
+          }
+        });
+        */
         console.log({ users });
     },
     async tstDriver() {
@@ -70,5 +96,10 @@ let fncs = {
         console.log({ res });
     },
 };
-runCli(fncs);
+try {
+    runCli(fncs);
+}
+catch (e) {
+    console.error(e);
+}
 //# sourceMappingURL=to-test.js.map
