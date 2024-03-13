@@ -12,7 +12,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import "reflect-metadata";
 import { Entity, Column, TableInheritance, ChildEntity, OneToMany, ManyToOne, } from "typeorm";
-import { PkBaseEntity, resetToDataSource, getToDataSource, typeOf, } from '../../typeorm/index.js';
+import { PkBaseEntity, resetToDataSource, getToDataSource, typeOf, typeOfEach, } from '../../typeorm/index.js';
 // Multi-table / concrete inheritance
 let MtUser = class MtUser extends PkBaseEntity {
 };
@@ -141,6 +141,7 @@ export async function mkStTests() {
     let entities = [Content, Photo, Question, stUser];
     //let entities = [  Photo, Question,  stUser];
     let ds = await resetToDataSource({ entities }); //
+    //let uData: any = { uname: "JoeSingle" };
     let uData = { uname: "JoeSingle" };
     let user = stUser.create(uData);
     //@ts-ignore
@@ -178,6 +179,7 @@ export async function fetchStUsr() {
     let toUsr = typeOf(usr);
     let toC1 = typeOf(c1);
     let toC2 = typeOf(c2);
+    console.log(typeOfEach({ usr, c1, c2, }));
     console.log({ toUsr, toC1, toC2 });
     return usrs;
 }

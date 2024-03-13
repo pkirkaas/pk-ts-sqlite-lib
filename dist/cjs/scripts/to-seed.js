@@ -78,13 +78,18 @@ export async function mkUsers(cnt = 3) {
     let pk = await User.findOne({ where: { email: "p@b.com" }, relations: ["posts"] });
     let toPk = typeOf(pk);
     let pkId = pk.id;
-    console.log(`Got pk:`, { pk, pkId, toPk });
-    let tstPostDatum = { title: "Manual Post Title4", content: "Manual Post Content4", user: pk, };
+    let userId = pk.id;
+    //let tstPostDatum = {title:"Manual Post Title4", content: "Manual Post Content4",user:pk,};
+    //let tstPostDatum = {title:"Manual Post Title4", content: "Manual Post Content4",user:pk,};
+    let tstPostDatum = { title: "Opt Manual Post Title4", content: "Manual Post Content4",
+        // userId , user_id:userId,
+        user: pk, };
+    console.log(`Got pk:`, { pk, pkId, toPk, userId, tstPostDatum });
     let tstPost = Post.create(tstPostDatum);
     await tstPost.save();
     //pk.posts.push(Post.create(tstPostDatum));
-    pk.posts = [tstPost,];
-    await pk.save();
+    //pk.posts = [tstPost,];
+    ////await pk.save();
     // The below works after making the user in Post relationship optional
     // let tstPostDatum = {title:"Manual Post Title1", content: "Manual Post Content1",user:pk,};
     // let tstPost = Post.create(tstPostDatum);
