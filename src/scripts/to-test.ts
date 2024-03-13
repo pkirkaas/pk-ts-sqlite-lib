@@ -5,6 +5,7 @@
 import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, } from '../typeorm/index.js';
 
 import {
+  Raw,
 	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
 	BaseEntity, TableInheritance,ChildEntity,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
@@ -12,6 +13,10 @@ import {
 } from "typeorm";
 
 import {User, Post, mkUsers, mkUserData, } from "./to-seed.js";
+
+import { //MtBase, MtChild1, MtChild2, MtUser,
+  mkMtTests,mkStTests,fetchStUsr,
+} from './totests/to-inheritance.js';
 
 //await getToDataSource({entities:[User, Post]});
 //await getToDataSource();
@@ -49,6 +54,21 @@ let fncs = {
 
   },
 
+  async tstUsr() {
+    let ts = await fetchStUsr();
+    console.log({ts});
+  },
+
+  async tstSt() {
+    let ts = await mkStTests();
+    console.log({ts});
+  },
+
+  async tstMt() {
+    let ts = await mkMtTests();
+    console.log({ts});
+  },
+
 
 
   async tstReset() {
@@ -64,8 +84,10 @@ let fncs = {
     let usrRepo = await ds.getRepository(User);
     let users = await usrRepo.find({
       where: {
-        firstName:'Ceasar',
+        //firstName:'Ceasar',
         //udata : {intKey:1},
+//        "udata->>'$.intKey'" : 9,
+        udata: Raw((alias) => "udata->>'$.intKey' = 2"),
       }
     });
     console.log({users});

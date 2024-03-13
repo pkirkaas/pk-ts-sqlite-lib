@@ -16,12 +16,12 @@ import {runCli, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqlite
 
 import { faker } from '@faker-js/faker';
 
-// Creating Entities
+// Create Test Entities
 
 
 @Entity() export class User extends PkBaseEntity {
 	@Column({ unique: true, }) email: string;
-	@Column() firstName: string;
+	@Column({default:"Default Name"}) firstName: string;
 	//@Column("simple-json") udata;
 	@Column({nullable:true, type:"json"}) udata;
 	@Column({ nullable: true }) pwd: string;

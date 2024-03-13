@@ -15,7 +15,7 @@ import { Entity, Column, OneToMany, ManyToOne, } from "typeorm";
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
 import { PkBaseEntity, typeOf, } from '../typeorm/index.js';
 import { faker } from '@faker-js/faker';
-// Creating Entities
+// Create Test Entities
 let User = class User extends PkBaseEntity {
 };
 __decorate([
@@ -23,7 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    Column(),
+    Column({ default: "Default Name" }),
     __metadata("design:type", String)
 ], User.prototype, "firstName", void 0);
 __decorate([

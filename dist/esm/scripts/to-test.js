@@ -2,7 +2,10 @@
  * Testing TypeORM implementation
  */
 import { runCli, resetToDataSource, getToDataSource, typeOf, AppDataSource, } from '../typeorm/index.js';
+import { Raw, } from "typeorm";
 import { User, Post, mkUsers, } from "./to-seed.js";
+import { //MtBase, MtChild1, MtChild2, MtUser,
+mkMtTests, mkStTests, fetchStUsr, } from './totests/to-inheritance.js';
 //await getToDataSource({entities:[User, Post]});
 //await getToDataSource();
 let entities = { entities: [User, Post] };
@@ -35,6 +38,18 @@ let fncs = {
             console.log(`Unhandled option: ${opt} !!!`);
         }
     },
+    async tstUsr() {
+        let ts = await fetchStUsr();
+        console.log({ ts });
+    },
+    async tstSt() {
+        let ts = await mkStTests();
+        console.log({ ts });
+    },
+    async tstMt() {
+        let ts = await mkMtTests();
+        console.log({ ts });
+    },
     async tstReset() {
         await resetToDataSource({ entities: [User, Post] });
         let res = await mkUsers();
@@ -47,8 +62,10 @@ let fncs = {
         let usrRepo = await ds.getRepository(User);
         let users = await usrRepo.find({
             where: {
-                firstName: 'Ceasar',
+                //firstName:'Ceasar',
                 //udata : {intKey:1},
+                //        "udata->>'$.intKey'" : 9,
+                udata: Raw((alias) => "udata->>'$.intKey' = 2"),
             }
         });
         console.log({ users });

@@ -69,7 +69,7 @@ export declare let commonExtends: {
     result: {};
     model: {
         $allModels: {
-            exists<T>(this: T, where: Prisma.Args<T, "findFirst">["where"]): Promise<any>;
+            exists<T>(this: T, where: Prisma.Args<T, 'findFirst'>['where']): Promise<any>;
             /**  Returns the findMany query with JSON string fields parsed to Objects
              * NOT chainable because awaits
              */
