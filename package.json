@@ -39,7 +39,7 @@
     "seed": "node --loader  ts-node/esm ./prisma/seed.ts"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.2.0",
+    "@faker-js/faker": "*",
     "@prisma/client": "*",
     "@types/sqlite3": "*",
     "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
