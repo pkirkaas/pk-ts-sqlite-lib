@@ -3,7 +3,7 @@
  * Assumes Prisma has been initialized
  */
 import { Prisma, } from '@prisma/client';
-import { dbgWrt, runCli, getSchema, getPrisma, allProps, getProps, asEnumerable, } from '../index.js';
+import { dbgWrt, runCli, getSchema, getPrisma, allProps, getProps, asEnumerable, } from '../prisma/index.js';
 let prisma = await getPrisma();
 import { typeOf } from 'pk-ts-common-lib';
 let testsFs = {
