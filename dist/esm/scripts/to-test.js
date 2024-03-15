@@ -78,13 +78,16 @@ let fncs = {
         let uQb = usrRepo.createQueryBuilder('user');
         let users = await uQb.where(
         //'user.firstName = :fname', {fname:'Ceasar'}).getMany();
-        /* THIS WORKS !!!
+        // THIS WORKS for SQLite!!!
+        /*
         "json_extract(`udata`, :path) = :val", {
-    path: `$.intKey`,
-    val: 9
+    path: '$.intKey',
+    val: '2'
   }
     */
-        "udata->>'$.intKey' = :val", { val: 2 })
+        //(SQLIte): "udata->>'$.intKey' = :val", {val: '2'}
+        //Postgres
+        "udata->>'intKey' = :val", { val: 2 })
             .getMany();
         /*
         let users = await usrRepo.find({

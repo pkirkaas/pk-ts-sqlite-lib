@@ -4,6 +4,7 @@
 
 import { openDb, tableExists, createTbl, ColDef, getSqliteTables, runCli, emptySqliteTables, } from '../index.js';
 
+import { UsCitiesZipObj, } from '../pkfaker/index.js'
 const tblName = `tstTbl`;
 const cdefs: ColDef = {
 	name: 'string not null',
@@ -19,6 +20,9 @@ let iStr = `INSERT INTO ${tblName} ( name, skill, yrs_exp_gen, yrs_exp_sig, emai
 let tQ = `SELECT * FROM ${tblName}`;
 
 let tstFncs = {
+	tstUSZ() {
+		console.log({UsCitiesZipObj});
+	},
 	here: async () => {
 		console.log("Here in tst");
 	},

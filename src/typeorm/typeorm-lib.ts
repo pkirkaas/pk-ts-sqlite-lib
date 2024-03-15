@@ -15,13 +15,35 @@ import { DataSource, DataSourceOptions } from "typeorm";
 
 export let AppDataSource = null;
 
-let defaultToConfig:DataSourceOptions = { //The default for SQLite
+let sqlitToConfig:DataSourceOptions = { //The default for SQLite
     type: 'sqlite',
 		database: process.env.TO_SQLITE || './tmp/def-to-sqlite.db',
 		synchronize: true,
 
 };
 
+let mySqlToConfig:DataSourceOptions = {
+  type:"mysql",
+  host: process.env.MYSQL_HOST || 'localhost',
+  port: 3306,
+  username: 'root', //process.env.MYSQL_USER,
+  password: '', //process.env.MYSQL_PWD,
+  database: process.env.MYSQL_DB,
+  synchronize: true,
+}
+
+let postgresToConfig:DataSourceOptions = {
+  type:"postgres",
+  host: process.env.PG_HOST || 'localhost',
+  port: parseInt(process.env.PG_PORT),
+  username: process.env.PG_USER,
+  password: process.env.PG_PWD,
+  database: process.env.PG_DB,
+  synchronize: true,
+
+}
+//let defaultToConfig:DataSourceOptions = mySqlToConfig;
+let defaultToConfig:DataSourceOptions = postgresToConfig;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
  * @param ToConfig 

@@ -13,6 +13,12 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
+    "./pkfaker": {
+      "types": "./dist/esm/pkfaker/index.d.ts",
+      "default": "./dist/cjs/pkfaker/index.js",
+      "import": "./dist/esm/pkfaker/index.js",
+      "require": "./dist/cjs/pkfaker/index.js"
+    },
     "./typeorm": {
       "types": "./dist/esm/typeorm/index.d.ts",
       "default": "./dist/cjs/typeorm/index.js",
@@ -21,7 +27,7 @@
     },
     "./tsconfig.cjs.json": "./tsconfig.cjs.json",
     "./tsconfig.json": "./tsconfig.json",
-    "./package.json" : "./package.json"
+    "./package.json": "./package.json"
   },
   "engines": {
     "node": ">= 18.0.0"
@@ -42,6 +48,8 @@
     "@faker-js/faker": "*",
     "@prisma/client": "*",
     "@types/sqlite3": "*",
+    "mysql2": "*",
+    "pg": "^8.11.3",
     "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
     "prisma": "*",
     "sqlite": "*",
