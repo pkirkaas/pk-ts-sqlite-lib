@@ -1,7 +1,7 @@
 /**
  * Tests for pk-ts-sqlite-lib
  */
-import { openDb, createTbl, getSqliteTables, runCli, emptySqliteTables, } from '../index.js';
+import { openDb, createTbl, getSqliteTables, runCli, emptySqliteTables, getRandEls, } from '../index.js';
 import { UsCitiesZipObj, } from '../pkfaker/index.js';
 const tblName = `tstTbl`;
 const cdefs = {
@@ -16,7 +16,9 @@ let iStr = `INSERT INTO ${tblName} ( name, skill, yrs_exp_gen, yrs_exp_sig, emai
 let tQ = `SELECT * FROM ${tblName}`;
 let tstFncs = {
     tstUSZ() {
-        console.log({ UsCitiesZipObj });
+        let someCities = getRandEls(UsCitiesZipObj, 15);
+        console.log({ someCities });
+        //console.log({UsCitiesZipObj});
     },
     here: async () => {
         console.log("Here in tst");
