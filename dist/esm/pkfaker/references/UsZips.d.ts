@@ -14,6 +14,10 @@ export const UsCitiesKeyed: {
     city: string | number;
     lat: string | number;
     lon: string | number;
+    point: {
+        lat: string | number;
+        lon: string | number;
+    };
 }[];
 export const UsCitiesZipObj: {};
 //# sourceMappingURL=UsZips.d.ts.map

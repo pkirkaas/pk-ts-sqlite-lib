@@ -13,7 +13,7 @@ import { UsCitiesZipObj,
   import { format, } from "date-fns/format";
 
  import {
-  JSON5Stringify,  typeOf, getRandEls, haversine, GenObj, isObject, isSimpleObject, isNumeric, asNumeric, PkError, pkToDate, randInt,
+  JSON5Stringify,  typeOf, getRandEls, haversine, GenObj, isObject, isSimpleObject, isNumeric, asNumeric, PkError, pkToDate, randInt, validateDateFnsDuration, 
  } from 'pk-ts-node-lib';
  ;
 
@@ -44,7 +44,7 @@ import { UsCitiesZipObj,
   },
 
   /**
-   * Returns a date offset relative to Now
+   * Returns a date offset relative to Now or from
    * @param offset GenObj|number - 
    *    Obj  - { years, months, weeks, days, hours, minutes, seconds}
    *    number - days offset - positive in future, negative past.
@@ -52,23 +52,42 @@ import { UsCitiesZipObj,
    */
   offsetDate(offset:GenObj|number, from:any = null) {
     let opts:any;
-    if (isSimpleObject(offset)) {
+    if (validateDateFnsDuration(offset)) {
+    //if (isSimpleObject(offset)) {
       opts = offset;
     } else if (isNumeric(offset)) {
       opts = {days:asNumeric(offset)};
     } else {
       throw new PkError(`invalid arg to offsetDate:`, {offset})
     }
-    let reldate:any =  new Date();
-
-    if (from) {
-      reldate = pkToDate(from);
-      if (!reldate) {
-        throw new PkError(`invalid 'from' argument to offsetDate`, {from});
-      }
+    //let reldate:any =  new Date();
+    let reldate:any =  pkToDate(from); //new Date();
+    if (!reldate) {
+      throw new PkError(`invalid 'from' argument to offsetDate`, {from});
     }
     let retDate = add(reldate,opts);
     return retDate;
+  },
+
+  /**
+   * Like faker.between, just way better
+   * Returns a rand date in range, optionally offset to future or past 
+   * @param from:Date|pkToDate - any pkToDate value
+   * @param to -  any pkToDate value or null for now
+   * @param offset - as for offsetDate above
+   */
+  between(from:any, to:any=null, offset:any=null) {
+    let dFrom :Date|Boolean= pkToDate(from);
+    let dTo:Date|Boolean = pkToDate(to);
+    if (!dTo || !dFrom) {
+      throw new PkError (`invalid arg to between:`, {from, to});
+    }
+    if (offset) {
+      dFrom = this.offsetDate(offset, dFrom);
+      dTo = this.offsetDate(offset, dTo);
+    }
+    //@ts-ignore
+    return faker.date.between({from:dFrom, to:dTo});
   },
 
 

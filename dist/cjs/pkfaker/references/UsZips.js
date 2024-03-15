@@ -9,6 +9,7 @@
 export function zipArrToObj(zipArr) {
     let obj = {};
     for (let row of zipArr) {
+        //row.point = {lat:row.lat, lon:row.lon}
         obj[row['zip']] = row;
     }
     return obj;
@@ -29486,6 +29487,6 @@ export const UsCities = [
     [83126, "WY", "Smoot", 42.619238, -110.922351],
     [83127, "WY", "Thayne", 42.933026, -111.011354],
 ];
-export const UsCitiesKeyed = UsCities.map((row) => ({ zip: row[0].toString().padStart(5, "0"), state: row[1], city: row[2], lat: row[3], lon: row[4] }));
+export const UsCitiesKeyed = UsCities.map((row) => ({ zip: row[0].toString().padStart(5, "0"), state: row[1], city: row[2], lat: row[3], lon: row[4], point: { lat: row[3], lon: row[4], } }));
 export const UsCitiesZipObj = zipArrToObj(UsCitiesKeyed);
 //# sourceMappingURL=UsZips.js.map
