@@ -9,7 +9,7 @@ import { UsCitiesZipObj,
  import { faker } from '@faker-js/faker';
  import _ from 'lodash';
 
- import { formatISO, isValid, add } from "date-fns";
+ import { formatISO, isValid, add, isBefore, } from "date-fns";
   import { format, } from "date-fns/format";
 
  import {
@@ -41,6 +41,14 @@ import { UsCitiesZipObj,
      let stateZips = zipsOfState(state);
      let randZip = getRandEls(stateZips);
      return randZip;
+  },
+
+  /**
+   * Returns a specific zip row for zip
+   * @param zip 
+   */
+  getZipRow(zip:string) {
+    return UsCitiesZipObj[zip];
   },
 
   /**
@@ -81,6 +89,13 @@ import { UsCitiesZipObj,
     let dTo:Date|Boolean = pkToDate(to);
     if (!dTo || !dFrom) {
       throw new PkError (`invalid arg to between:`, {from, to});
+    }
+    // So dumb of faker!!
+    //@ts-ignore
+    if (isBefore(dTo, dFrom)) {
+      let tmp = dFrom;
+      dFrom = dTo;
+      dTo = tmp;
     }
     if (offset) {
       dFrom = this.offsetDate(offset, dFrom);

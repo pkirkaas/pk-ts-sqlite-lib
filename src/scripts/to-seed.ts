@@ -5,25 +5,48 @@
 import "reflect-metadata";
 import {
 	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
-	BaseEntity, 
+	BaseEntity,  Point,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 } from "typeorm";
 
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
 
-import {runCli, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, } from '../typeorm/index.js';
+import {runCli, GenObj, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables,
+	haversine,
+} from '../typeorm/index.js';
 
 
 import { faker } from '@faker-js/faker';
+import {pkfaker ,} from '../pkfaker/index.js';
 
 // Create Test Entities
 
+@Entity() export class Place extends PkBaseEntity {
+	//@Column({ unique: true, }) email: string;
+	@Column() name: string;
+	@Column() city: string;
+	@Column() state: string;
+	@Column() zip: string;
+	@Column('float') lat: number;
+	@Column('float') lon: number;
+	@Column("geometry",{srid:4326}) latlon:Point;
+	@Column({nullable:true, type:"json"}) ziprow;
+	distance(place:GenObj) {
+		return Math.floor(haversine(this, place)/1000);
+	}
+	sayName() {
+		return this.name;
+	}
+}
 
 @Entity() export class User extends PkBaseEntity {
 	@Column({ unique: true, }) email: string;
 	@Column({default:"Default Name"}) firstName: string;
 	//@Column("simple-json") udata;
 	@Column({nullable:true, type:"json"}) udata;
+	//@Column({nullable:true, type:"point"}) latlon;;
+	@Column({nullable:true, type:"geometry"}) latlon:Point;
+	@Column({nullable:true,}) zip:string;;
 	@Column({ nullable: true }) pwd: string;
 	@OneToMany(() => Post, (post) => post.user) posts: Post[];
 }
@@ -32,6 +55,29 @@ import { faker } from '@faker-js/faker';
 	@Column() title: string;
 	@Column() content: string;
 	@ManyToOne(() => User, (user) => user.posts) user?: User; //Weirdly had to make this optional for TS to compile
+}
+
+export function mkPoint(src:GenObj):Point {
+	let point:Point = {
+		type:"Point",
+		coordinates: [src.lat, src.lon],
+	}
+	return point;
+}
+
+export function mkPlaceData(state:string = 'CA') {
+	let ziprow = pkfaker.randUsZip(state);
+	let placeData:GenObj = {
+		name:faker.person.firstName(),
+		city:ziprow.city,
+		zip:ziprow.zip,
+		state:ziprow.state,
+		lat:ziprow.lat,
+		lon:ziprow.lon,
+		ziprow,
+		latlon : mkPoint(ziprow),
+	};
+	return placeData;
 }
 
 export async function mkUsers(cnt=3) {
@@ -91,11 +137,13 @@ export function mkUserData(cnt = 4) {
 	//let data:GenObj[] = [defUsrData];
 	let data:any[] = [defUsrData];
 	for (let i = 0; i < cnt; i++) {
+		let ziprow = pkfaker.randUsZip();
 		data.push({
 			firstName: faker.person.firstName(),
 			email: faker.internet.email(),
 			pwd: 'tstpwd3',
 			udata: {strKey:"Here", intKey:i},
+			zip: ziprow.zip,
 	//		detailsJSON: { somDetails: faker.company.name() },
 	//		posts: { create: mkPostData() },
 

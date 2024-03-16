@@ -3,8 +3,11 @@
  */
 
 import { openDb, tableExists, createTbl, ColDef, getSqliteTables, runCli, emptySqliteTables,
- getRandEls,
+ getRandEls, pkToDate,
 } from '../index.js';
+
+import {add, 
+} from 'date-fns';
 
 import { UsCitiesZipObj, } from '../pkfaker/index.js'
 const tblName = `tstTbl`;
@@ -22,6 +25,12 @@ let iStr = `INSERT INTO ${tblName} ( name, skill, yrs_exp_gen, yrs_exp_sig, emai
 let tQ = `SELECT * FROM ${tblName}`;
 
 let tstFncs = {
+	tstDFNS() {
+		let now = new Date();
+		let before = add(now, {months: -3});
+		console.log({now, before});
+
+	},
 	tstUSZ() {
 		let someCities = getRandEls(UsCitiesZipObj, 15);
 		console.log({someCities});

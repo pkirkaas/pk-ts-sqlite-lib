@@ -3,7 +3,8 @@
  */
 import { runCli, resetToDataSource, getToDataSource, typeOf, AppDataSource, } from '../typeorm/index.js';
 import { Raw, } from "typeorm";
-import { User, Post, mkUsers, } from "./to-seed.js";
+import { User, Post, mkUsers, Place, mkPlaceData, } from "./to-seed.js";
+import { pkfaker, } from '../pkfaker/index.js';
 import { //MtBase, MtChild1, MtChild2, MtUser,
 mkMtTests, mkStTests, fetchStUsr, } from './totests/to-inheritance.js';
 //await getToDataSource({entities:[User, Post]});
@@ -98,6 +99,40 @@ let fncs = {
         });
         */
         console.log({ users });
+    },
+    async initPlaces() {
+        let ts = await getToDataSource({ entities: [Place], dropSchema: true });
+        let bulkData = [];
+        for (let i = 0; i < 300; i++) {
+            let placeData = mkPlaceData();
+            bulkData.push(placeData);
+        }
+        //console.log({placeData});
+        let places = Place.create(bulkData);
+        //await place.save();
+        await Place.save(places);
+        //console.log({place});
+        console.log("Done Making Places!");
+    },
+    async tstDist(dist = 1000) {
+        let ds = await getToDataSource({ entities: [Place] });
+        let placeRepo = await ds.getRepository(Place);
+        let venice = pkfaker.getZipRow('90291');
+        let pQb = placeRepo.createQueryBuilder('place');
+        //let qStr =  'ST_Dwithin(place.latlon, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        let qStr = 'ST_DWithin(place.latlon, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        let qParams = { lon: venice.lon, lat: venice.lat, distance: dist * 1000 };
+        let sql = await pQb.where(qStr, qParams).getSql();
+        let res = await pQb.where(qStr, qParams).getMany();
+        //.printSql()
+        //.getMany();
+        console.log({ sql, res, qStr, qParams });
+        //    let places = await placeRepo.find();
+        //    let aplace = places[0];
+        //   let fromVenice = aplace.distance(venice);
+        //let pname = places[0].sayName();
+        //  console.log({venice, fromVenice,  aplace});
+        //console.log({places});
     },
     async tstDriver() {
         let toDS = typeOf(AppDataSource);

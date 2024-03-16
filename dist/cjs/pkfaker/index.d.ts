@@ -11,6 +11,11 @@ export declare const pkfaker: {
      */
     randUsZip(state?: any): any;
     /**
+     * Returns a specific zip row for zip
+     * @param zip
+     */
+    getZipRow(zip: string): any;
+    /**
      * Returns a date offset relative to Now or from
      * @param offset GenObj|number -
      *    Obj  - { years, months, weeks, days, hours, minutes, seconds}

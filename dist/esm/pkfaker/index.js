@@ -4,7 +4,7 @@
 export * from './references/index.js';
 import { UsCitiesZipObj, } from './references/UsZips.js';
 import { faker } from '@faker-js/faker';
-import { add } from "date-fns";
+import { add, isBefore, } from "date-fns";
 import { getRandEls, isNumeric, asNumeric, PkError, pkToDate, validateDateFnsDuration, } from 'pk-ts-node-lib';
 ;
 export function zipsOfState(state) {
@@ -29,6 +29,13 @@ export const pkfaker = {
         let stateZips = zipsOfState(state);
         let randZip = getRandEls(stateZips);
         return randZip;
+    },
+    /**
+     * Returns a specific zip row for zip
+     * @param zip
+     */
+    getZipRow(zip) {
+        return UsCitiesZipObj[zip];
     },
     /**
      * Returns a date offset relative to Now or from
@@ -69,6 +76,13 @@ export const pkfaker = {
         let dTo = pkToDate(to);
         if (!dTo || !dFrom) {
             throw new PkError(`invalid arg to between:`, { from, to });
+        }
+        // So dumb of faker!!
+        //@ts-ignore
+        if (isBefore(dTo, dFrom)) {
+            let tmp = dFrom;
+            dFrom = dTo;
+            dTo = tmp;
         }
         if (offset) {
             dFrom = this.offsetDate(offset, dFrom);

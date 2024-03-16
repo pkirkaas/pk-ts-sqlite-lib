@@ -52,7 +52,7 @@ let defaultToConfig:DataSourceOptions = postgresToConfig;
 export async function getToDataSource(ToConfig:GenObj = {}) {
   let config:DataSourceOptions = {...defaultToConfig, ...ToConfig};
   if (AppDataSource === null) {
-    console.log(`Trying to initialze DA w.`, {config});
+    //console.log(`Trying to initialze DA w.`, {config});
     AppDataSource = new DataSource(config);
     await AppDataSource.initialize();
   }

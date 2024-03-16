@@ -2,6 +2,7 @@
  * Tests for pk-ts-sqlite-lib
  */
 import { openDb, createTbl, getSqliteTables, runCli, emptySqliteTables, getRandEls, } from '../index.js';
+import { add, } from 'date-fns';
 import { UsCitiesZipObj, } from '../pkfaker/index.js';
 const tblName = `tstTbl`;
 const cdefs = {
@@ -15,6 +16,11 @@ let iStr = `INSERT INTO ${tblName} ( name, skill, yrs_exp_gen, yrs_exp_sig, emai
   ( 'TIME MACHINE', 'Passages', 3, 2, 'joe@end.dog' ), ( 'YESTERDAY', 'Unskilled', 7, 3, 'mary@ex.com') ; `;
 let tQ = `SELECT * FROM ${tblName}`;
 let tstFncs = {
+    tstDFNS() {
+        let now = new Date();
+        let before = add(now, { months: -3 });
+        console.log({ now, before });
+    },
     tstUSZ() {
         let someCities = getRandEls(UsCitiesZipObj, 15);
         console.log({ someCities });

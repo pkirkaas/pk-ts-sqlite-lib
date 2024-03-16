@@ -13,10 +13,56 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import "reflect-metadata";
 import { Entity, Column, OneToMany, ManyToOne, } from "typeorm";
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
-import { PkBaseEntity, typeOf, } from '../typeorm/index.js';
+import { PkBaseEntity, typeOf, haversine, } from '../typeorm/index.js';
 import { faker } from '@faker-js/faker';
+import { pkfaker, } from '../pkfaker/index.js';
 // Create Test Entities
+let Place = class Place extends PkBaseEntity {
+    distance(place) {
+        return Math.floor(haversine(this, place) / 1000);
+    }
+    sayName() {
+        return this.name;
+    }
+};
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Place.prototype, "name", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Place.prototype, "city", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Place.prototype, "state", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Place.prototype, "zip", void 0);
+__decorate([
+    Column('float'),
+    __metadata("design:type", Number)
+], Place.prototype, "lat", void 0);
+__decorate([
+    Column('float'),
+    __metadata("design:type", Number)
+], Place.prototype, "lon", void 0);
+__decorate([
+    Column("geometry", { srid: 4326 }),
+    __metadata("design:type", Object)
+], Place.prototype, "latlon", void 0);
+__decorate([
+    Column({ nullable: true, type: "json" }),
+    __metadata("design:type", Object)
+], Place.prototype, "ziprow", void 0);
+Place = __decorate([
+    Entity()
+], Place);
+export { Place };
 let User = class User extends PkBaseEntity {
+    ;
 };
 __decorate([
     Column({ unique: true, }),
@@ -30,6 +76,14 @@ __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)
 ], User.prototype, "udata", void 0);
+__decorate([
+    Column({ nullable: true, type: "geometry" }),
+    __metadata("design:type", Object)
+], User.prototype, "latlon", void 0);
+__decorate([
+    Column({ nullable: true, }),
+    __metadata("design:type", String)
+], User.prototype, "zip", void 0);
 __decorate([
     Column({ nullable: true }),
     __metadata("design:type", String)
@@ -60,6 +114,27 @@ Post = __decorate([
     Entity()
 ], Post);
 export { Post };
+export function mkPoint(src) {
+    let point = {
+        type: "Point",
+        coordinates: [src.lat, src.lon],
+    };
+    return point;
+}
+export function mkPlaceData(state = 'CA') {
+    let ziprow = pkfaker.randUsZip(state);
+    let placeData = {
+        name: faker.person.firstName(),
+        city: ziprow.city,
+        zip: ziprow.zip,
+        state: ziprow.state,
+        lat: ziprow.lat,
+        lon: ziprow.lon,
+        ziprow,
+        latlon: mkPoint(ziprow),
+    };
+    return placeData;
+}
 export async function mkUsers(cnt = 3) {
     //	await emptySqliteTables(litePath);
     let userData = mkUserData(cnt);
@@ -112,11 +187,13 @@ export function mkUserData(cnt = 4) {
     //let data:GenObj[] = [defUsrData];
     let data = [defUsrData];
     for (let i = 0; i < cnt; i++) {
+        let ziprow = pkfaker.randUsZip();
         data.push({
             firstName: faker.person.firstName(),
             email: faker.internet.email(),
             pwd: 'tstpwd3',
             udata: { strKey: "Here", intKey: i },
+            zip: ziprow.zip,
             //		detailsJSON: { somDetails: faker.company.name() },
             //		posts: { create: mkPostData() },
         });
