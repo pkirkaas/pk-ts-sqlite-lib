@@ -123,13 +123,16 @@ let fncs = {
         //let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
         let qStr = 'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
         let qParams = { lon: venice.lon, lat: venice.lat, distance: dist * 1000 };
-        let sql = await pQb.where(qStr, qParams).getSql();
-        let res = await pQb.where(qStr, qParams).getMany();
+        //let sql = await pQb.where( qStr , qParams) .getSql();
+        //let res = await pQb.where( qStr , qParams) .getMany();
+        pQb.where(qStr, qParams);
+        pQb.andWhere('place.city = :city', { city: 'Pasadena' });
+        let res = await pQb.getMany();
         let cnt = res.length;
         let short = res.map((place) => ({ zip: place.zip, city: place.city, distance: place.distance(venice), }));
         //.printSql()
         //.getMany();
-        console.log({ sql, short, cnt, qStr, qParams });
+        console.log({ short, cnt, qStr, qParams });
     },
     async tstDist2(dist = 1000) {
         let ds = await getToDataSource({ entities: [Place] });
