@@ -52,7 +52,7 @@ __decorate([
 __decorate([
     Column("geometry", { srid: 4326 }),
     __metadata("design:type", Object)
-], Place.prototype, "latlon", void 0);
+], Place.prototype, "lonlat", void 0);
 __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)
@@ -79,7 +79,7 @@ __decorate([
 __decorate([
     Column({ nullable: true, type: "geometry" }),
     __metadata("design:type", Object)
-], User.prototype, "latlon", void 0);
+], User.prototype, "lonlat", void 0);
 __decorate([
     Column({ nullable: true, }),
     __metadata("design:type", String)
@@ -117,7 +117,7 @@ export { Post };
 export function mkPoint(src) {
     let point = {
         type: "Point",
-        coordinates: [src.lat, src.lon],
+        coordinates: [src.lon, src.lat],
     };
     return point;
 }
@@ -131,7 +131,7 @@ export function mkPlaceData(state = 'CA') {
         lat: ziprow.lat,
         lon: ziprow.lon,
         ziprow,
-        latlon: mkPoint(ziprow),
+        lonlat: mkPoint(ziprow),
     };
     return placeData;
 }

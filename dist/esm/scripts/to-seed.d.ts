@@ -11,7 +11,7 @@ export declare class Place extends PkBaseEntity {
     zip: string;
     lat: number;
     lon: number;
-    latlon: Point;
+    lonlat: Point;
     ziprow: any;
     distance(place: GenObj): number;
     sayName(): string;
@@ -20,7 +20,7 @@ export declare class User extends PkBaseEntity {
     email: string;
     firstName: string;
     udata: any;
-    latlon: Point;
+    lonlat: Point;
     zip: string;
     pwd: string;
     posts: Post[];

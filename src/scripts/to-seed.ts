@@ -29,7 +29,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 	@Column() zip: string;
 	@Column('float') lat: number;
 	@Column('float') lon: number;
-	@Column("geometry",{srid:4326}) latlon:Point;
+	@Column("geometry",{srid:4326}) lonlat:Point;
 	@Column({nullable:true, type:"json"}) ziprow;
 	distance(place:GenObj) {
 		return Math.floor(haversine(this, place)/1000);
@@ -44,8 +44,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 	@Column({default:"Default Name"}) firstName: string;
 	//@Column("simple-json") udata;
 	@Column({nullable:true, type:"json"}) udata;
-	//@Column({nullable:true, type:"point"}) latlon;;
-	@Column({nullable:true, type:"geometry"}) latlon:Point;
+	@Column({nullable:true, type:"geometry"}) lonlat:Point;
 	@Column({nullable:true,}) zip:string;;
 	@Column({ nullable: true }) pwd: string;
 	@OneToMany(() => Post, (post) => post.user) posts: Post[];
@@ -60,7 +59,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 export function mkPoint(src:GenObj):Point {
 	let point:Point = {
 		type:"Point",
-		coordinates: [src.lat, src.lon],
+		coordinates: [src.lon, src.lat],
 	}
 	return point;
 }
@@ -75,7 +74,7 @@ export function mkPlaceData(state:string = 'CA') {
 		lat:ziprow.lat,
 		lon:ziprow.lon,
 		ziprow,
-		latlon : mkPoint(ziprow),
+		lonlat : mkPoint(ziprow),
 	};
 	return placeData;
 }

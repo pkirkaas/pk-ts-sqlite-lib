@@ -114,25 +114,45 @@ let fncs = {
         //console.log({place});
         console.log("Done Making Places!");
     },
-    async tstDist(dist = 1000) {
+    async tstDist(dist = 200) {
         let ds = await getToDataSource({ entities: [Place] });
         let placeRepo = await ds.getRepository(Place);
         let venice = pkfaker.getZipRow('90291');
         let pQb = placeRepo.createQueryBuilder('place');
-        //let qStr =  'ST_Dwithin(place.latlon, ST_MakePoint(:lon, :lat)::geography, :distance)';
-        let qStr = 'ST_DWithin(place.latlon, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        //let qStr =  'ST_Dwithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        //let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        let qStr = 'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
         let qParams = { lon: venice.lon, lat: venice.lat, distance: dist * 1000 };
         let sql = await pQb.where(qStr, qParams).getSql();
         let res = await pQb.where(qStr, qParams).getMany();
+        let cnt = res.length;
+        let short = res.map((place) => ({ zip: place.zip, city: place.city, distance: place.distance(venice), }));
         //.printSql()
         //.getMany();
-        console.log({ sql, res, qStr, qParams });
-        //    let places = await placeRepo.find();
-        //    let aplace = places[0];
-        //   let fromVenice = aplace.distance(venice);
-        //let pname = places[0].sayName();
-        //  console.log({venice, fromVenice,  aplace});
-        //console.log({places});
+        console.log({ sql, short, cnt, qStr, qParams });
+    },
+    async tstDist2(dist = 1000) {
+        let ds = await getToDataSource({ entities: [Place] });
+        let placeRepo = await ds.getRepository(Place);
+        let venice = pkfaker.getZipRow('90291');
+        let vPoint = {
+            type: "Point",
+            coordinates: [venice.lon, venice.lat],
+        };
+        let pQb = placeRepo.createQueryBuilder('place');
+        //let qStr =  'ST_Dwithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        /*
+        let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        let qParams = {lon:venice.lon, lat:venice.lat, distance: dist * 1000};
+        */
+        /*
+        let qStr = ''
+         let sql = await pQb.where( qStr , qParams) .getSql();
+         let res = await pQb.where( qStr , qParams) .getMany();
+         //.printSql()
+         //.getMany();
+         console.log({sql, res, qStr, qParams});
+         */
     },
     async tstDriver() {
         let toDS = typeOf(AppDataSource);
