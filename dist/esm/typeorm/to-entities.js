@@ -13,6 +13,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import "reflect-metadata";
 import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, } from "typeorm";
 export class PkBaseEntity extends BaseEntity {
+    static getTableName() {
+        return this.getRepository().metadata.tableName;
+    }
+    //static aQueryBuilder():QueryBuilder {
+    static newQueryBuilder() {
+        let tableName = this.getTableName();
+        return this.createQueryBuilder(tableName);
+    }
 }
 __decorate([
     PrimaryGeneratedColumn(),

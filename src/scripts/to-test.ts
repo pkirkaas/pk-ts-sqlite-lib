@@ -2,7 +2,9 @@
  * Testing TypeORM implementation
  */
 
-import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, writeData, haversine,} from '../typeorm/index.js';
+import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, writeData, haversine,
+  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
+} from '../typeorm/index.js';
 
 import {
   Raw, Point,
@@ -31,6 +33,28 @@ let entities = {entities:[User, Post]}
 //await AppDataSource.initialize();
 
 let fncs = {
+  async insEnt() {
+    let ds = await getToDataSource({entities:[Place]});
+    //let placeRepo =  await ds.getRepository(Place);
+    let placeRepo =  await Place.getRepository();
+    let pTN = Place.getTableName();
+    let nqb = Place.newQueryBuilder();
+    console.log({pTN, nqb});
+    /*
+    let repoMetadata = placeRepo.metadata;
+    let tableName = repoMetadata.tableName;
+    let repoDets =  allProps(placeRepo, 'tvp', 3);
+    //console.log({Place, placeRepo});
+    let placeJS = JSON5Stringify(Place);
+    //let placeDets = allPropsWithTypes(Place);
+    //let placeDets = objInfo(Place);
+    let placeDets = allProps(Place, 'tvp', 3);
+    saveData(placeDets,{fname:'PlaceData'});
+    saveData(repoDets,{fname:'RepoData'});
+    //console.log({Place});
+    console.log({placeJS, repoMetadata, tableName});
+    */
+  },
   async tstInit() {
     console.log({AppDataSource});
   },
@@ -144,9 +168,12 @@ let fncs = {
   },
   async tstDist(dist=200) {
     let ds = await getToDataSource({entities:[Place]});
-    let placeRepo =  await ds.getRepository(Place);
+    //let placeRepo =  await ds.getRepository(Place);
+    let placeRepo = Place.getRepository();
+    //let pQb = placeRepo.createQueryBuilder();
+    //let pQb = Place.createQueryBuilder('place');
+    let pQb = Place.newQueryBuilder();
     let venice = pkfaker.getZipRow('90291');
-    let pQb = placeRepo.createQueryBuilder('place');
     //let qStr =  'ST_Dwithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
     //let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
     let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';

@@ -7,5 +7,7 @@ export declare class PkBaseEntity extends BaseEntity {
     id: string;
     createdAt: Date;
     updatedAt: Date;
+    static getTableName(): string;
+    static newQueryBuilder(): any;
 }
 //# sourceMappingURL=to-entities.d.ts.map
