@@ -11,15 +11,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import "reflect-metadata";
-import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, } from "typeorm";
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, } from "typeorm";
+/**
+ * Enhanced BaseEntity
+ */
 export class PkBaseEntity extends BaseEntity {
+    /**
+     *  Returns the table name for this entity type
+     * @returns string - table name of the entity
+     */
     static getTableName() {
+        // @ts-ignore
         return this.getRepository().metadata.tableName;
     }
-    //static aQueryBuilder():QueryBuilder {
+    /**
+     * A new query builder for this entity, without needing the table name
+     * CAN USE JUST andWhere, don't need to start w. where
+     * @returns queryBulder for this entity
+     */
     static newQueryBuilder() {
         let tableName = this.getTableName();
-        return this.createQueryBuilder(tableName);
+        // @ts-ignore
+        let qb = this.createQueryBuilder(tableName);
+        return qb;
     }
 }
 __decorate([
@@ -34,4 +48,22 @@ __decorate([
     UpdateDateColumn(),
     __metadata("design:type", Date)
 ], PkBaseEntity.prototype, "updatedAt", void 0);
+export class PkBaseUser extends PkBaseEntity {
+}
+__decorate([
+    Column({ nullable: true, unique: true, }),
+    __metadata("design:type", String)
+], PkBaseUser.prototype, "email", void 0);
+__decorate([
+    Column({ nullable: true, default: "Default Name" }),
+    __metadata("design:type", String)
+], PkBaseUser.prototype, "name", void 0);
+__decorate([
+    Column({ nullable: true }),
+    __metadata("design:type", String)
+], PkBaseUser.prototype, "pwd", void 0);
+__decorate([
+    Column({ nullable: true, type: "json" }),
+    __metadata("design:type", Object)
+], PkBaseUser.prototype, "udata", void 0);
 //# sourceMappingURL=to-entities.js.map

@@ -11,7 +11,7 @@ import { GenObj, typeOf, isEmpty, PkError, } from './index.js';
 
 //import { PkBaseEntity } from './to-entities.js';
 
-import { DataSource, DataSourceOptions } from "typeorm";
+import { DataSource, DataSourceOptions, Point, } from "typeorm";
 
 export let AppDataSource = null;
 
@@ -64,13 +64,41 @@ export async function getToDataSource(ToConfig:GenObj = {}) {
 }
 
 /**
+ * Creates a TypeORM GeoPont object column data 
+ * @param GenObj w. keys of lon, lat 
+ * @returns TypeORM Geo Point object
+ */
+export function mkPoint(src:GenObj):Point {
+	let point:Point = {
+		type:"Point",
+		coordinates: [src.lon, src.lat],
+	}
+	return point;
+}
+
+// Test if dropSchema works as expected
+export async function resetToDataSource(ToConfig:GenObj = {}) {
+  let config:DataSourceOptions = {...defaultToConfig, ...ToConfig, synchronize:true, dropSchema:true,};
+  // @ts-ignore
+  if (AppDataSource === null) {
+    console.log(`Trying to initialze DA w.`, {config});
+    AppDataSource = new DataSource(config);
+    await AppDataSource.initialize();
+  }
+  if (!AppDataSource.isInitialized) {
+    throw new PkError("TO DataSource not initialized, w. config:", {config});
+  }
+  return AppDataSource;
+}
+
+/**
  * ONLY FOR TEST/DEV !!!!
  * DELETES ALL EXISTING ENTITIES FROM DB!!!
  * Then creates new entities from the config entities key
  * @param ToConfig 
  * @returns empty, initialized datasource
  */
-export async function resetToDataSource(ToConfig:GenObj = {}) {
+export async function origResetToDataSource(ToConfig:GenObj = {}) {
   let config:DataSourceOptions = {...defaultToConfig, ...ToConfig};
   let lentities = config.entities;
   // @ts-ignore

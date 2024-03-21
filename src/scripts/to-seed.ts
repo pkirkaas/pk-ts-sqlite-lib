@@ -12,7 +12,7 @@ import {
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
 
 import {runCli, GenObj, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables,
-	haversine,
+	haversine, PkBaseUser, mkPoint, resetToDataSource, origResetToDataSource,
 } from '../typeorm/index.js';
 
 
@@ -21,24 +21,35 @@ import {pkfaker ,} from '../pkfaker/index.js';
 
 // Create Test Entities
 
+/**
+ * US Locations based on zip code 
+ */
 @Entity() export class Place extends PkBaseEntity {
 	//@Column({ unique: true, }) email: string;
 	@Column() name: string;
 	@Column() city: string;
 	@Column() state: string;
 	@Column() zip: string;
+	@Column({nullable:true}) address: string;
 	@Column('float') lat: number;
 	@Column('float') lon: number;
 	@Column("geometry",{srid:4326}) lonlat:Point;
-	@Column({nullable:true, type:"json"}) ziprow;
-	distance(place:GenObj) {
+	@Column({nullable:true, type:"json"}) ziprow; // The zip row content
+	@Column({nullable:true, type: "json",}) pdata; //Whatever optional place data  
+	distance(place:GenObj) { // Testing DB distance queries with JS Haversine distance calc, in KM
 		return Math.floor(haversine(this, place)/1000);
 	}
 	sayName() {
 		return this.name;
 	}
 }
+@Entity() export class User extends PkBaseUser {
+	@Column({nullable:true, type:"geometry"}) lonlat:Point;
+	@Column({nullable:true,}) zip:string;;
+	@OneToMany(() => Post, (post) => post.user) posts: Post[];
+}
 
+/*
 @Entity() export class User extends PkBaseEntity {
 	@Column({ unique: true, }) email: string;
 	@Column({default:"Default Name"}) firstName: string;
@@ -49,6 +60,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 	@Column({ nullable: true }) pwd: string;
 	@OneToMany(() => Post, (post) => post.user) posts: Post[];
 }
+*/
 
 @Entity() export class Post extends PkBaseEntity {
 	@Column() title: string;
@@ -56,13 +68,6 @@ import {pkfaker ,} from '../pkfaker/index.js';
 	@ManyToOne(() => User, (user) => user.posts) user?: User; //Weirdly had to make this optional for TS to compile
 }
 
-export function mkPoint(src:GenObj):Point {
-	let point:Point = {
-		type:"Point",
-		coordinates: [src.lon, src.lat],
-	}
-	return point;
-}
 
 export function mkPlaceData(state:string = 'CA') {
 	let ziprow = pkfaker.randUsZip(state);
@@ -77,7 +82,23 @@ export function mkPlaceData(state:string = 'CA') {
 		lonlat : mkPoint(ziprow),
 	};
 	return placeData;
-}
+};
+
+export async function mkPlaces(cnt=400) {
+    let bulkData = [];
+    for (let i = 0 ; i < cnt; i++){
+      let placeData = mkPlaceData();
+      bulkData.push(placeData);
+
+    }
+    //console.log({placeData});
+    let places = Place.create(bulkData);
+    //await place.save();
+    await Place.save(places);
+    //console.log({place});
+    console.log("Done Making Places!");
+
+};
 
 export async function mkUsers(cnt=3) {
 //	await emptySqliteTables(litePath);
@@ -119,12 +140,13 @@ export async function mkUsers(cnt=3) {
 //	let tstPosts = Post.create([tstPostDatum]);
 	//await Post.save(tstPosts);
 	//await tstPost.save();
+	console.log(`Done making seed users`);
 
 }
 
 export function mkUserData(cnt = 4) {
 	let defUsrData = {
-		firstName: "Paul",
+		name: "Paul",
 		email: "p@b.com",
 		pwd: "abcd",
 		udata: {akey:"astr", intKey: 9,},
@@ -138,7 +160,7 @@ export function mkUserData(cnt = 4) {
 	for (let i = 0; i < cnt; i++) {
 		let ziprow = pkfaker.randUsZip();
 		data.push({
-			firstName: faker.person.firstName(),
+			name: faker.person.firstName(),
 			email: faker.internet.email(),
 			pwd: 'tstpwd3',
 			udata: {strKey:"Here", intKey:i},
@@ -150,3 +172,26 @@ export function mkUserData(cnt = 4) {
 	}
 	return data;
 }
+
+/*
+
+let sfncs = {
+	default() {
+		console.log("The default seed function");
+	},
+	another() {
+		console.log("The another, non-default function");
+	},
+	async seedPlaces() {
+		let entities = [Place, User, Post];
+		let ds = await resetToDataSource({entities});
+		//let ds = await resetToDataSource(entities);
+		//let ds = await origResetToDataSource(entities);
+		await mkUsers();
+		await mkPlaces();
+		console.log(`Done seeding places and users`);
+	},
+};
+
+runCli(sfncs);
+*/

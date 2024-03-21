@@ -13,7 +13,7 @@ let entities = { entities: [User, Post] };
 //AppDataSource.setOptions(entities);
 //await AppDataSource.synchronize(true);
 //await AppDataSource.initialize();
-let fncs = {
+let tfncs = {
     async insEnt() {
         let ds = await getToDataSource({ entities: [Place] });
         //let placeRepo =  await ds.getRepository(Place);
@@ -136,7 +136,7 @@ let fncs = {
         //console.log({place});
         console.log("Done Making Places!");
     },
-    async tstDist(dist = 200) {
+    async tstDist(dist = 500) {
         let ds = await getToDataSource({ entities: [Place] });
         //let placeRepo =  await ds.getRepository(Place);
         let placeRepo = Place.getRepository();
@@ -146,12 +146,14 @@ let fncs = {
         let venice = pkfaker.getZipRow('90291');
         //let qStr =  'ST_Dwithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
         //let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
-        let qStr = 'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        //let qStr =  'ST_DWithin(place.lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
+        let qStr = 'ST_DWithin(lonlat, ST_MakePoint(:lon, :lat)::geography, :distance)';
         let qParams = { lon: venice.lon, lat: venice.lat, distance: dist * 1000 };
         //let sql = await pQb.where( qStr , qParams) .getSql();
         //let res = await pQb.where( qStr , qParams) .getMany();
-        pQb.where(qStr, qParams);
-        pQb.andWhere('place.city = :city', { city: 'Pasadena' });
+        //pQb.where("1=1");
+        pQb.andWhere(qStr, qParams);
+        //pQb.andWhere('place.city = :city', {city:'Pasadena'});
         let res = await pQb.getMany();
         let cnt = res.length;
         let short = res.map((place) => ({ zip: place.zip, city: place.city, distance: place.distance(venice), }));
@@ -200,7 +202,7 @@ let fncs = {
     },
 };
 try {
-    runCli(fncs);
+    runCli(tfncs);
 }
 catch (e) {
     console.error(e);

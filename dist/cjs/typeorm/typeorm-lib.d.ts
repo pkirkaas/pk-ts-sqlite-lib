@@ -4,6 +4,7 @@
 import "reflect-metadata";
 export * from './to-entities.js';
 import { GenObj } from './index.js';
+import { Point } from "typeorm";
 export declare let AppDataSource: any;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
@@ -12,11 +13,18 @@ export declare let AppDataSource: any;
  */
 export declare function getToDataSource(ToConfig?: GenObj): Promise<any>;
 /**
+ * Creates a TypeORM GeoPont object column data
+ * @param GenObj w. keys of lon, lat
+ * @returns TypeORM Geo Point object
+ */
+export declare function mkPoint(src: GenObj): Point;
+export declare function resetToDataSource(ToConfig?: GenObj): Promise<any>;
+/**
  * ONLY FOR TEST/DEV !!!!
  * DELETES ALL EXISTING ENTITIES FROM DB!!!
  * Then creates new entities from the config entities key
  * @param ToConfig
  * @returns empty, initialized datasource
  */
-export declare function resetToDataSource(ToConfig?: GenObj): Promise<any>;
+export declare function origResetToDataSource(ToConfig?: GenObj): Promise<any>;
 //# sourceMappingURL=typeorm-lib.d.ts.map

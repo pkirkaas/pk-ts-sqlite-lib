@@ -13,10 +13,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import "reflect-metadata";
 import { Entity, Column, OneToMany, ManyToOne, } from "typeorm";
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
-import { PkBaseEntity, typeOf, haversine, } from '../typeorm/index.js';
+import { PkBaseEntity, typeOf, haversine, PkBaseUser, mkPoint, } from '../typeorm/index.js';
 import { faker } from '@faker-js/faker';
 import { pkfaker, } from '../pkfaker/index.js';
 // Create Test Entities
+/**
+ * US Locations based on zip code
+ */
 let Place = class Place extends PkBaseEntity {
     distance(place) {
         return Math.floor(haversine(this, place) / 1000);
@@ -42,6 +45,10 @@ __decorate([
     __metadata("design:type", String)
 ], Place.prototype, "zip", void 0);
 __decorate([
+    Column({ nullable: true }),
+    __metadata("design:type", String)
+], Place.prototype, "address", void 0);
+__decorate([
     Column('float'),
     __metadata("design:type", Number)
 ], Place.prototype, "lat", void 0);
@@ -57,25 +64,17 @@ __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)
 ], Place.prototype, "ziprow", void 0);
+__decorate([
+    Column({ nullable: true, type: "json", }),
+    __metadata("design:type", Object)
+], Place.prototype, "pdata", void 0);
 Place = __decorate([
     Entity()
 ], Place);
 export { Place };
-let User = class User extends PkBaseEntity {
+let User = class User extends PkBaseUser {
     ;
 };
-__decorate([
-    Column({ unique: true, }),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
-    Column({ default: "Default Name" }),
-    __metadata("design:type", String)
-], User.prototype, "firstName", void 0);
-__decorate([
-    Column({ nullable: true, type: "json" }),
-    __metadata("design:type", Object)
-], User.prototype, "udata", void 0);
 __decorate([
     Column({ nullable: true, type: "geometry" }),
     __metadata("design:type", Object)
@@ -85,10 +84,6 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "zip", void 0);
 __decorate([
-    Column({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "pwd", void 0);
-__decorate([
     OneToMany(() => Post, (post) => post.user),
     __metadata("design:type", Array)
 ], User.prototype, "posts", void 0);
@@ -96,6 +91,18 @@ User = __decorate([
     Entity()
 ], User);
 export { User };
+/*
+@Entity() export class User extends PkBaseEntity {
+    @Column({ unique: true, }) email: string;
+    @Column({default:"Default Name"}) firstName: string;
+    //@Column("simple-json") udata;
+    @Column({nullable:true, type:"json"}) udata;
+    @Column({nullable:true, type:"geometry"}) lonlat:Point;
+    @Column({nullable:true,}) zip:string;;
+    @Column({ nullable: true }) pwd: string;
+    @OneToMany(() => Post, (post) => post.user) posts: Post[];
+}
+*/
 let Post = class Post extends PkBaseEntity {
 };
 __decorate([
@@ -114,13 +121,6 @@ Post = __decorate([
     Entity()
 ], Post);
 export { Post };
-export function mkPoint(src) {
-    let point = {
-        type: "Point",
-        coordinates: [src.lon, src.lat],
-    };
-    return point;
-}
 export function mkPlaceData(state = 'CA') {
     let ziprow = pkfaker.randUsZip(state);
     let placeData = {
@@ -135,6 +135,21 @@ export function mkPlaceData(state = 'CA') {
     };
     return placeData;
 }
+;
+export async function mkPlaces(cnt = 400) {
+    let bulkData = [];
+    for (let i = 0; i < cnt; i++) {
+        let placeData = mkPlaceData();
+        bulkData.push(placeData);
+    }
+    //console.log({placeData});
+    let places = Place.create(bulkData);
+    //await place.save();
+    await Place.save(places);
+    //console.log({place});
+    console.log("Done Making Places!");
+}
+;
 export async function mkUsers(cnt = 3) {
     //	await emptySqliteTables(litePath);
     let userData = mkUserData(cnt);
@@ -172,10 +187,11 @@ export async function mkUsers(cnt = 3) {
     //	let tstPosts = Post.create([tstPostDatum]);
     //await Post.save(tstPosts);
     //await tstPost.save();
+    console.log(`Done making seed users`);
 }
 export function mkUserData(cnt = 4) {
     let defUsrData = {
-        firstName: "Paul",
+        name: "Paul",
         email: "p@b.com",
         pwd: "abcd",
         udata: { akey: "astr", intKey: 9, },
@@ -189,7 +205,7 @@ export function mkUserData(cnt = 4) {
     for (let i = 0; i < cnt; i++) {
         let ziprow = pkfaker.randUsZip();
         data.push({
-            firstName: faker.person.firstName(),
+            name: faker.person.firstName(),
             email: faker.internet.email(),
             pwd: 'tstpwd3',
             udata: { strKey: "Here", intKey: i },
@@ -200,4 +216,26 @@ export function mkUserData(cnt = 4) {
     }
     return data;
 }
+/*
+
+let sfncs = {
+    default() {
+        console.log("The default seed function");
+    },
+    another() {
+        console.log("The another, non-default function");
+    },
+    async seedPlaces() {
+        let entities = [Place, User, Post];
+        let ds = await resetToDataSource({entities});
+        //let ds = await resetToDataSource(entities);
+        //let ds = await origResetToDataSource(entities);
+        await mkUsers();
+        await mkPlaces();
+        console.log(`Done seeding places and users`);
+    },
+};
+
+runCli(sfncs);
+*/ 
 //# sourceMappingURL=to-seed.js.map
