@@ -5,7 +5,7 @@
 import "reflect-metadata";
 import {
 	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
-	BaseEntity,  Point,
+	BaseEntity,  Point, QueryBuilder, VirtualColumn, AfterLoad,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 
 } from "typeorm";
@@ -17,6 +17,7 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 	@PrimaryGeneratedColumn() id: string;
 	@CreateDateColumn() createdAt: Date;
 	@UpdateDateColumn() updatedAt: Date;
+	@Column({nullable:true, type:"json"}) edata; //Whatever JSON data an entity wants...
 
 	/**
 	 *  Returns the table name for this entity type
@@ -33,6 +34,7 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 	 * @returns queryBulder for this entity
 	 */
 	static newQueryBuilder():any {
+	//static newQueryBuilder():QueryBuilder<any> {
 		let tableName = this.getTableName();
 		// @ts-ignore
 		let qb = this.createQueryBuilder(tableName);
@@ -45,6 +47,12 @@ export abstract class PkBaseUser extends PkBaseEntity {
 	@Column({nullable: true, default:"Default Name"}) name: string;
 	@Column({ nullable: true }) pwd: string;
 	@Column({nullable:true, type:"json"}) udata;
+	// @ts-ignore
+	@AfterLoad() virtc() { this.virtne =  `NAMEEMAIL: ${this.email} ${this.name}`; }
+	
+	get namemail() {
+		return `NAMEEMAIL: ${this.email} ${this.name}`; 
+	}
 }
 
 //Experiment w. embedded entity props

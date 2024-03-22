@@ -61,9 +61,18 @@ let tfncs = {
             console.log(`Unhandled option: ${opt} !!!`);
         }
     },
-    async tstUsr() {
+    async tstStUsr() {
         let ts = await fetchStUsr();
         console.log({ ts });
+    },
+    async tstUsr() {
+        let ds = await getToDataSource({ entities: [User, Post] });
+        let usrs = await User.newQueryBuilder().getMany();
+        let usrsJ = JSON.stringify(usrs, null, 2);
+        let usrsP = JSON.parse(usrsJ);
+        //let ts = await fetchStUsr();
+        let nameemail = usrs[0].namemail;
+        console.log({ usrs, nameemail, usrsJ, usrsP });
     },
     async tstSt() {
         let ts = await mkStTests();

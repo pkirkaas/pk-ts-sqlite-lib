@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import "reflect-metadata";
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, } from "typeorm";
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, AfterLoad, } from "typeorm";
 /**
  * Enhanced BaseEntity
  */
@@ -30,6 +30,7 @@ export class PkBaseEntity extends BaseEntity {
      * @returns queryBulder for this entity
      */
     static newQueryBuilder() {
+        //static newQueryBuilder():QueryBuilder<any> {
         let tableName = this.getTableName();
         // @ts-ignore
         let qb = this.createQueryBuilder(tableName);
@@ -48,7 +49,16 @@ __decorate([
     UpdateDateColumn(),
     __metadata("design:type", Date)
 ], PkBaseEntity.prototype, "updatedAt", void 0);
+__decorate([
+    Column({ nullable: true, type: "json" }),
+    __metadata("design:type", Object)
+], PkBaseEntity.prototype, "edata", void 0);
 export class PkBaseUser extends PkBaseEntity {
+    // @ts-ignore
+    virtc() { this.virtne = `NAMEEMAIL: ${this.email} ${this.name}`; }
+    get namemail() {
+        return `NAMEEMAIL: ${this.email} ${this.name}`;
+    }
 }
 __decorate([
     Column({ nullable: true, unique: true, }),
@@ -66,6 +76,12 @@ __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)
 ], PkBaseUser.prototype, "udata", void 0);
+__decorate([
+    AfterLoad(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], PkBaseUser.prototype, "virtc", null);
 //Experiment w. embedded entity props
 /**
  * Until further investigation, Entities that include this embedded should define it as:

@@ -10,6 +10,7 @@ export declare abstract class PkBaseEntity extends BaseEntity {
     id: string;
     createdAt: Date;
     updatedAt: Date;
+    edata: any;
     /**
      *  Returns the table name for this entity type
      * @returns string - table name of the entity
@@ -27,6 +28,8 @@ export declare abstract class PkBaseUser extends PkBaseEntity {
     name: string;
     pwd: string;
     udata: any;
+    virtc(): void;
+    get namemail(): string;
 }
 /**
  * Until further investigation, Entities that include this embedded should define it as:
