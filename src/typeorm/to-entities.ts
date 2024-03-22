@@ -5,7 +5,7 @@
 import "reflect-metadata";
 import {
 	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
-	BaseEntity, 
+	BaseEntity,  Point,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 
 } from "typeorm";
@@ -46,3 +46,35 @@ export abstract class PkBaseUser extends PkBaseEntity {
 	@Column({ nullable: true }) pwd: string;
 	@Column({nullable:true, type:"json"}) udata;
 }
+
+//Experiment w. embedded entity props
+
+/**
+ * Until further investigation, Entities that include this embedded should define it as:
+ *	@Column(() => Location) loc:Location;
+ * Idea is to automatically create the geopont from lat, lon, and add "distance" query
+ */
+export class Location {
+	@Column({nullable:true,}) lat: number;
+	@Column({nullable:true,}) lon: number;
+	@Column('geometry', {srid:4326, nullable:true,}) geopt: Point;
+	static getWhats():string {
+		return "That's what";
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

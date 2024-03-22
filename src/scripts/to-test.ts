@@ -14,7 +14,7 @@ import {
    Tree,   TreeChildren, TreeParent, TreeLevelColumn,
 } from "typeorm";
 
-import {User, Post, mkUsers, mkUserData, Place, mkPlaceData, } from "./to-seed.js";
+import {User, Post, mkUsers, mkUserData, Place, mkPlaceData, } from "../typeorm/to-test-e-s.js";
 
 import {pkfaker ,} from '../pkfaker/index.js';
 

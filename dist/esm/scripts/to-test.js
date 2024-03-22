@@ -3,7 +3,7 @@
  */
 import { runCli, resetToDataSource, getToDataSource, typeOf, AppDataSource, } from '../typeorm/index.js';
 import { Raw, } from "typeorm";
-import { User, Post, mkUsers, Place, mkPlaceData, } from "./to-seed.js";
+import { User, Post, mkUsers, Place, mkPlaceData, } from "../typeorm/to-test-e-s.js";
 import { pkfaker, } from '../pkfaker/index.js';
 import { //MtBase, MtChild1, MtChild2, MtUser,
 mkMtTests, mkStTests, fetchStUsr, } from './totests/to-inheritance.js';

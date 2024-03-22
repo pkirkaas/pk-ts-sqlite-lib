@@ -66,4 +66,27 @@ __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)
 ], PkBaseUser.prototype, "udata", void 0);
+//Experiment w. embedded entity props
+/**
+ * Until further investigation, Entities that include this embedded should define it as:
+ *	@Column(() => Location) loc:Location;
+ * Idea is to automatically create the geopont from lat, lon, and add "distance" query
+ */
+export class Location {
+    static getWhats() {
+        return "That's what";
+    }
+}
+__decorate([
+    Column({ nullable: true, }),
+    __metadata("design:type", Number)
+], Location.prototype, "lat", void 0);
+__decorate([
+    Column({ nullable: true, }),
+    __metadata("design:type", Number)
+], Location.prototype, "lon", void 0);
+__decorate([
+    Column('geometry', { srid: 4326, nullable: true, }),
+    __metadata("design:type", Object)
+], Location.prototype, "geopt", void 0);
 //# sourceMappingURL=to-entities.js.map

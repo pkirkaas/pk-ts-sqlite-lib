@@ -2,7 +2,7 @@
  * Building a library of enhanced TypeORM Entities
  */
 import "reflect-metadata";
-import { BaseEntity } from "typeorm";
+import { BaseEntity, Point } from "typeorm";
 /**
  * Enhanced BaseEntity
  */
@@ -27,5 +27,16 @@ export declare abstract class PkBaseUser extends PkBaseEntity {
     name: string;
     pwd: string;
     udata: any;
+}
+/**
+ * Until further investigation, Entities that include this embedded should define it as:
+ *	@Column(() => Location) loc:Location;
+ * Idea is to automatically create the geopont from lat, lon, and add "distance" query
+ */
+export declare class Location {
+    lat: number;
+    lon: number;
+    geopt: Point;
+    static getWhats(): string;
 }
 //# sourceMappingURL=to-entities.d.ts.map
