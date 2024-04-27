@@ -14,6 +14,7 @@ exec 1>&2
 echo "The script dir: [$SCRIPT_DIR]; called from: [$BASEDIR]"
 npm run build
 STAT=$?
-git add ./dist
+#git add ./dist
+git add -A
 echo "Exit status of tsc was: [$STAT]"
 exit $?

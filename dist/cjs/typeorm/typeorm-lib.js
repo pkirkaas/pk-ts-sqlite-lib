@@ -8,12 +8,12 @@ import { PkError, } from './index.js';
 //import { PkBaseEntity } from './to-entities.js';
 import { DataSource, } from "typeorm";
 export let AppDataSource = null;
-let sqlitToConfig = {
+export let sqliteToConfig = {
     type: 'sqlite',
     database: process.env.TO_SQLITE || './tmp/def-to-sqlite.db',
     synchronize: true,
 };
-let mySqlToConfig = {
+export let mySqlToConfig = {
     type: "mysql",
     host: process.env.MYSQL_HOST || 'localhost',
     port: 3306,
@@ -22,7 +22,7 @@ let mySqlToConfig = {
     database: process.env.MYSQL_DB,
     synchronize: true,
 };
-let postgresToConfig = {
+export let postgresToConfig = {
     type: "postgres",
     host: process.env.PG_HOST || 'localhost',
     port: parseInt(process.env.PG_PORT),
@@ -32,7 +32,7 @@ let postgresToConfig = {
     synchronize: true,
 };
 //let defaultToConfig:DataSourceOptions = mySqlToConfig;
-let defaultToConfig = postgresToConfig;
+export let defaultToConfig = postgresToConfig;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
  * @param ToConfig

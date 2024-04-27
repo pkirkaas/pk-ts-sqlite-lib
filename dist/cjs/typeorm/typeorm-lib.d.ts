@@ -4,8 +4,12 @@
 import "reflect-metadata";
 export * from './to-entities.js';
 import { GenObj } from './index.js';
-import { Point } from "typeorm";
+import { DataSourceOptions, Point } from "typeorm";
 export declare let AppDataSource: any;
+export declare let sqliteToConfig: DataSourceOptions;
+export declare let mySqlToConfig: DataSourceOptions;
+export declare let postgresToConfig: DataSourceOptions;
+export declare let defaultToConfig: DataSourceOptions;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
  * @param ToConfig
