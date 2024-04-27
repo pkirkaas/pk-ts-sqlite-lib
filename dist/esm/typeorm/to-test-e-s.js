@@ -80,10 +80,6 @@ let User = class User extends PkBaseUser {
     ;
 };
 __decorate([
-    Column({ nullable: true, type: "geometry" }),
-    __metadata("design:type", Object)
-], User.prototype, "lonlat", void 0);
-__decorate([
     Column({ nullable: true, }),
     __metadata("design:type", String)
 ], User.prototype, "zip", void 0);

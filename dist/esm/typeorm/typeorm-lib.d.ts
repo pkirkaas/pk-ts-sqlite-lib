@@ -17,6 +17,12 @@ export declare let defaultToConfig: DataSourceOptions;
  */
 export declare function getToDataSource(ToConfig?: GenObj): Promise<any>;
 /**
+ * Deletes/empties all given entities/tables
+ * @param entities - array of entities to delete/empty
+ * @param dataSource - data source, null for default
+ */
+export declare function clearEntities(entities: any[], dataSource?: any): Promise<any[]>;
+/**
  * Creates a TypeORM GeoPont object column data
  * @param GenObj w. keys of lon, lat
  * @returns TypeORM Geo Point object

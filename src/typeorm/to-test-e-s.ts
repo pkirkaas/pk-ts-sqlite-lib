@@ -46,7 +46,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 	}
 }
 @Entity() export class User extends PkBaseUser {
-	@Column({nullable:true, type:"geometry"}) lonlat:Point;
+	//@Column({nullable:true, type:"geometry"}) lonlat:Point;
 	@Column({nullable:true,}) zip:string;;
 	@OneToMany(() => Post, (post) => post.user) posts: Post[];
 }

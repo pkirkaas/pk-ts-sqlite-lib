@@ -2,7 +2,7 @@
  * Testing TypeORM implementation
  */
 
-import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, writeData, haversine,
+import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, writeData, haversine, clearEntities,sqliteToConfig,
   saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
 } from '../typeorm/index.js';
 
@@ -25,7 +25,8 @@ import { //MtBase, MtChild1, MtChild2, MtUser,
 //await getToDataSource({entities:[User, Post]});
 //await getToDataSource();
 
-let entities = {entities:[User, Post]}
+// ORIG - below will break stuff: let entities = {entities:[User, Post]}
+let entities = [Post, User,];
 
 //AppDataSource.setOptions(entities);
 
@@ -56,7 +57,20 @@ let tfncs = {
     */
   },
   async tstInit() {
-    console.log({AppDataSource});
+    let ds = await getToDataSource({...sqliteToConfig, entities});
+    let postRepo = ds.getRepository(Post);
+    let posts = await postRepo.find();
+    //console.log({AppDataSource, posts});
+    console.log({ posts});
+  },
+
+
+
+  async tstClear() {
+    let entitiesToClear = [Post];
+    let ds = await getToDataSource({...sqliteToConfig, entities});
+    let ceRes = await clearEntities(entitiesToClear,);
+    console.log(`Res from clearEntities:`,{ceRes});
   },
 
   async dsTst(opt='empty') {

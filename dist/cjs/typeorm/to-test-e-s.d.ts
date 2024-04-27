@@ -23,7 +23,6 @@ export declare class Place extends PkBaseEntity {
     sayName(): string;
 }
 export declare class User extends PkBaseUser {
-    lonlat: Point;
     zip: string;
     posts: Post[];
 }

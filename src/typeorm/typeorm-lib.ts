@@ -64,6 +64,25 @@ export async function getToDataSource(ToConfig:GenObj = {}) {
 }
 
 /**
+ * Deletes/empties all given entities/tables 
+ * @param entities - array of entities to delete/empty
+ * @param dataSource - data source, null for default
+ */
+export async function clearEntities(entities:any[], dataSource:any=null) {
+  if (!dataSource) {
+    //dataSource = AppDataSource;
+    dataSource = await getToDataSource();;
+  }
+  let repoMetadata = [];
+  for (let entity of entities) {
+    let repository =  dataSource.getRepository(entity);
+    await repository.clear();
+    repoMetadata.push(await repository.metadata);
+  }
+  return repoMetadata;
+} 
+
+/**
  * Creates a TypeORM GeoPont object column data 
  * @param GenObj w. keys of lon, lat 
  * @returns TypeORM Geo Point object

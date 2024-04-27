@@ -1,7 +1,7 @@
 /**
  * Testing TypeORM implementation
  */
-import { runCli, resetToDataSource, getToDataSource, typeOf, AppDataSource, } from '../typeorm/index.js';
+import { runCli, resetToDataSource, getToDataSource, typeOf, AppDataSource, clearEntities, sqliteToConfig, } from '../typeorm/index.js';
 import { Raw, } from "typeorm";
 import { User, Post, mkUsers, Place, mkPlaceData, } from "../typeorm/to-test-e-s.js";
 import { pkfaker, } from '../pkfaker/index.js';
@@ -9,7 +9,8 @@ import { //MtBase, MtChild1, MtChild2, MtUser,
 mkMtTests, mkStTests, fetchStUsr, } from './totests/to-inheritance.js';
 //await getToDataSource({entities:[User, Post]});
 //await getToDataSource();
-let entities = { entities: [User, Post] };
+// ORIG - below will break stuff: let entities = {entities:[User, Post]}
+let entities = [Post, User,];
 //AppDataSource.setOptions(entities);
 //await AppDataSource.synchronize(true);
 //await AppDataSource.initialize();
@@ -37,7 +38,17 @@ let tfncs = {
         */
     },
     async tstInit() {
-        console.log({ AppDataSource });
+        let ds = await getToDataSource({ ...sqliteToConfig, entities });
+        let postRepo = ds.getRepository(Post);
+        let posts = await postRepo.find();
+        //console.log({AppDataSource, posts});
+        console.log({ posts });
+    },
+    async tstClear() {
+        let entitiesToClear = [Post];
+        let ds = await getToDataSource({ ...sqliteToConfig, entities });
+        let ceRes = await clearEntities(entitiesToClear);
+        console.log(`Res from clearEntities:`, { ceRes });
     },
     async dsTst(opt = 'empty') {
         console.log(`Testing clear DS w. opt: ${opt}`);
