@@ -1,8 +1,13 @@
 /**
  * Testing TypeORM implementation
  */
-import { runCli, resetToDataSource, getToDataSource, typeOf, AppDataSource, clearEntities, sqliteToConfig, } from '../typeorm/index.js';
-import { Raw, } from "typeorm";
+import { runCli, resetToDataSource, getToDataSource, PkBaseEntity, 
+//typeOf,
+AppDataSource, clearEntities, sqliteToConfig,
+//  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
+ } from '../typeorm/index.js';
+import { typeOfEach, typeOf, } from 'pk-ts-common-lib';
+import { Raw, BaseEntity, } from "typeorm";
 import { User, Post, mkUsers, Place, mkPlaceData, } from "../typeorm/to-test-e-s.js";
 import { pkfaker, } from '../pkfaker/index.js';
 import { //MtBase, MtChild1, MtChild2, MtUser,
@@ -10,11 +15,19 @@ mkMtTests, mkStTests, fetchStUsr, } from './totests/to-inheritance.js';
 //await getToDataSource({entities:[User, Post]});
 //await getToDataSource();
 // ORIG - below will break stuff: let entities = {entities:[User, Post]}
-let entities = [Post, User,];
+let entities = { Post, User, };
+//let entities = [Post, User,];
 //AppDataSource.setOptions(entities);
 //await AppDataSource.synchronize(true);
 //await AppDataSource.initialize();
 let tfncs = {
+    async tstType() {
+        let ds = await getToDataSource({ ...sqliteToConfig, entities });
+        let User = entities.User;
+        let set = { User, PkBaseEntity, BaseEntity };
+        let toe = typeOfEach(set);
+        console.log({ toe });
+    },
     async insEnt() {
         let ds = await getToDataSource({ entities: [Place] });
         //let placeRepo =  await ds.getRepository(Place);

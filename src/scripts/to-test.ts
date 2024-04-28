@@ -2,12 +2,26 @@
  * Testing TypeORM implementation
  */
 
-import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables, writeData, haversine, clearEntities,sqliteToConfig,
-  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
+import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, 
+  //typeOf,
+  AppDataSource,emptySqliteTables, 
+  //writeData, 
+  haversine, clearEntities,sqliteToConfig,
+//  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
 } from '../typeorm/index.js';
+  
+  import {
+    saveData, objInspect, stackParse, dbgWrite,dbgWrt, utilInspect,
+    writeData, writeFile, 
+  } from 'pk-ts-node-lib';
+
+import {  //saveData, 
+  isClassOrFunction, classStack, getPrototypeChain,  typeOfEach, typeOf, JSON5, 
+  JSON5Stringify, JSONStringify, allProps, allPropsWithTypes, getObjDets, objInfo, getProps, subObj,
+   } from 'pk-ts-common-lib';
 
 import {
-  Raw, Point,
+  Raw, Point, 
 	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
 	BaseEntity, TableInheritance,ChildEntity,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
@@ -26,7 +40,8 @@ import { //MtBase, MtChild1, MtChild2, MtUser,
 //await getToDataSource();
 
 // ORIG - below will break stuff: let entities = {entities:[User, Post]}
-let entities = [Post, User,];
+let entities = {Post, User,};
+//let entities = [Post, User,];
 
 //AppDataSource.setOptions(entities);
 
@@ -34,6 +49,13 @@ let entities = [Post, User,];
 //await AppDataSource.initialize();
 
 let tfncs = {
+    async tstType() {
+      let ds = await getToDataSource({...sqliteToConfig, entities});
+      let User = entities.User; 
+      let set = {User, PkBaseEntity, BaseEntity};
+      let toe = typeOfEach(set);
+      console.log({toe});
+    }, 
   async insEnt() {
     let ds = await getToDataSource({entities:[Place]});
     //let placeRepo =  await ds.getRepository(Place);

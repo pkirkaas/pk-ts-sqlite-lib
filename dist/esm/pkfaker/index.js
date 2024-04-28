@@ -70,6 +70,12 @@ export const pkfaker = {
      * @param from:Date|pkToDate - any pkToDate value
      * @param to -  any pkToDate value or null for now
      * @param offset - as for offsetDate above
+     *
+     * Examples:
+     * let tstDts = {
+     *   tstPkToDate: pkToDate({days:-randInt(9)}),
+     *   tstBetween:  pkfaker.between(null, {days:20}, {days:-90 }),
+     * };
      */
     between(from, to = null, offset = null) {
         let dFrom = pkToDate(from);
