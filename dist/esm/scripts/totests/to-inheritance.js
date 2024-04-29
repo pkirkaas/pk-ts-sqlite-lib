@@ -15,6 +15,10 @@ import { Entity, Column, TableInheritance, ChildEntity, OneToMany, ManyToOne, } 
 import { PkBaseEntity, resetToDataSource, getToDataSource, typeOf, typeOfEach, } from '../../typeorm/index.js';
 // Multi-table / concrete inheritance
 let MtUser = class MtUser extends PkBaseEntity {
+    //@Column({ default:"DefU2Name"}) uName : string;
+    uname;
+    //@OneToMany(() => MtBase, (mtbase) => mtbase.user) mtbases: MtBase[];
+    mtbases;
 };
 __decorate([
     Column(),
@@ -29,7 +33,10 @@ MtUser = __decorate([
 ], MtUser);
 export { MtUser };
 export class MtBase extends PkBaseEntity {
+    eName;
     ;
+    //@Column({type:"int", default: 7}) eInt :integer;
+    eInt;
 }
 __decorate([
     Column({ default: "DefBName" }),
@@ -40,6 +47,9 @@ __decorate([
     __metadata("design:type", Number)
 ], MtBase.prototype, "eInt", void 0);
 let MtChild1 = class MtChild1 extends MtBase {
+    c1Name;
+    c1Int;
+    user;
 };
 __decorate([
     Column({ default: "DefC1Name" }),
@@ -58,6 +68,8 @@ MtChild1 = __decorate([
 ], MtChild1);
 export { MtChild1 };
 let MtChild2 = class MtChild2 extends MtBase {
+    c2Name;
+    c2Int;
 };
 __decorate([
     Column({ type: "text", default: "DefC2Name" }),
@@ -85,6 +97,10 @@ export async function mkMtTests() {
 }
 // Single table inheritance
 let stUser = class stUser extends PkBaseEntity {
+    //@Column({ default:"DefU2Name"}) uName : string;
+    uname;
+    //@OneToMany(() => MtBase, (mtbase) => mtbase.user) mtbases: MtBase[];
+    contents;
 };
 __decorate([
     Column(),
@@ -99,6 +115,9 @@ stUser = __decorate([
 ], stUser);
 export { stUser };
 let Content = class Content extends PkBaseEntity {
+    title;
+    description;
+    user;
 };
 __decorate([
     Column(),
@@ -118,6 +137,7 @@ Content = __decorate([
 ], Content);
 export { Content };
 let Photo = class Photo extends Content {
+    size;
 };
 __decorate([
     Column(),
@@ -128,6 +148,7 @@ Photo = __decorate([
 ], Photo);
 export { Photo };
 let Question = class Question extends Content {
+    answersCount;
 };
 __decorate([
     Column(),

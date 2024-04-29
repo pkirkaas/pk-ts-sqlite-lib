@@ -5,6 +5,7 @@
   "extends": "pk-ts-node-lib/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist/esm",
+    "esModuleInterop": true,
     "baseUrl": "./",
   },
   "include": [
@@ -15,7 +16,9 @@
     "require": [
       "tsconfig-paths/register"
     ],
-    "esm": true
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+    "experimentalResolver": true,
   },
   "typeRoots": [
     "node_modules/@types",

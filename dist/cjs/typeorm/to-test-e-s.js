@@ -21,6 +21,18 @@ import { pkfaker, } from '../pkfaker/index.js';
  * US Locations based on zip code
  */
 let Place = class Place extends PkBaseEntity {
+    //@Column({ unique: true, }) email: string;
+    name;
+    city;
+    state;
+    zip;
+    address;
+    loc;
+    lat;
+    lon;
+    lonlat;
+    ziprow; // The zip row content
+    pdata; //Whatever optional place data  
     distance(place) {
         return Math.floor(haversine(this, place) / 1000);
     }
@@ -77,7 +89,10 @@ Place = __decorate([
 ], Place);
 export { Place };
 let User = class User extends PkBaseUser {
+    //@Column({nullable:true, type:"geometry"}) lonlat:Point;
+    zip;
     ;
+    posts;
 };
 __decorate([
     Column({ nullable: true, }),
@@ -104,6 +119,9 @@ export { User };
 }
 */
 let Post = class Post extends PkBaseEntity {
+    title;
+    content;
+    user; //Weirdly had to make this optional for TS to compile
 };
 __decorate([
     Column(),

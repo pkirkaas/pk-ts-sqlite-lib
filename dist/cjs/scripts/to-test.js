@@ -6,7 +6,8 @@ import { runCli, resetToDataSource, getToDataSource, PkBaseEntity,
 AppDataSource, clearEntities, sqliteToConfig,
 //  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
  } from '../typeorm/index.js';
-import { typeOfEach, typeOf, } from 'pk-ts-common-lib';
+import { dbgWrt, } from 'pk-ts-node-lib';
+import { getPrototypeChain, typeOfEach, typeOf, getAncestorArr, JSON5Stringify, getObjDets, objInfo, } from 'pk-ts-common-lib';
 import { Raw, BaseEntity, } from "typeorm";
 import { User, Post, mkUsers, Place, mkPlaceData, } from "../typeorm/to-test-e-s.js";
 import { pkfaker, } from '../pkfaker/index.js';
@@ -16,6 +17,7 @@ mkMtTests, mkStTests, fetchStUsr, } from './totests/to-inheritance.js';
 //await getToDataSource();
 // ORIG - below will break stuff: let entities = {entities:[User, Post]}
 let entities = { Post, User, };
+let set = { User, PkBaseEntity, BaseEntity };
 //let entities = [Post, User,];
 //AppDataSource.setOptions(entities);
 //await AppDataSource.synchronize(true);
@@ -24,9 +26,25 @@ let tfncs = {
     async tstType() {
         let ds = await getToDataSource({ ...sqliteToConfig, entities });
         let User = entities.User;
-        let set = { User, PkBaseEntity, BaseEntity };
+        //      let set = {User, PkBaseEntity, BaseEntity};
         let toe = typeOfEach(set);
-        console.log({ toe });
+        let pchain = getPrototypeChain(User);
+        let ancs = getAncestorArr(User);
+        let uDets = getObjDets(User);
+        let uInfo = objInfo(User, 'tpv', 3);
+        let tstData = { toe, pchain, uDets, uInfo };
+        let jData = JSON5Stringify(tstData);
+        let fpath = dbgWrt(tstData);
+        let uIfB = (User instanceof BaseEntity);
+        let uInPt = BaseEntity.prototype.isPrototypeOf(User.prototype);
+        let bInPt = BaseEntity.prototype.isPrototypeOf(BaseEntity.prototype);
+        console.log(`Done: fpath: [${fpath}], anArr:`, { ancs, uIfB, uInPt, bInPt });
+        //console.log(tstData);
+        //console.log('in tstType');
+    },
+    async tstJson() {
+        let jst = JSON5Stringify(User);
+        console.log({ jst });
     },
     async insEnt() {
         let ds = await getToDataSource({ entities: [Place] });

@@ -16,7 +16,7 @@ import {runCli, resetToDataSource, getToDataSource, PkBaseEntity,
   } from 'pk-ts-node-lib';
 
 import {  //saveData, 
-  isClassOrFunction, classStack, getPrototypeChain,  typeOfEach, typeOf, JSON5, 
+  isClassOrFunction, classStack, getPrototypeChain,  typeOfEach, typeOf, JSON5, getAncestorArr,
   JSON5Stringify, JSONStringify, allProps, allPropsWithTypes, getObjDets, objInfo, getProps, subObj,
    } from 'pk-ts-common-lib';
 
@@ -41,6 +41,8 @@ import { //MtBase, MtChild1, MtChild2, MtUser,
 
 // ORIG - below will break stuff: let entities = {entities:[User, Post]}
 let entities = {Post, User,};
+
+let set = {User, PkBaseEntity, BaseEntity};
 //let entities = [Post, User,];
 
 //AppDataSource.setOptions(entities);
@@ -52,10 +54,26 @@ let tfncs = {
     async tstType() {
       let ds = await getToDataSource({...sqliteToConfig, entities});
       let User = entities.User; 
-      let set = {User, PkBaseEntity, BaseEntity};
+//      let set = {User, PkBaseEntity, BaseEntity};
       let toe = typeOfEach(set);
-      console.log({toe});
+      let pchain = getPrototypeChain(User);
+      let ancs = getAncestorArr(User);
+      let uDets = getObjDets(User);
+      let uInfo = objInfo(User,'tpv', 3);
+      let tstData = {toe, pchain, uDets, uInfo};
+      let jData = JSON5Stringify(tstData);
+      let fpath = dbgWrt(tstData);
+      let uIfB = (User instanceof BaseEntity);
+      let uInPt = BaseEntity.prototype.isPrototypeOf(User.prototype);
+      let bInPt = BaseEntity.prototype.isPrototypeOf(BaseEntity.prototype);
+      console.log(`Done: fpath: [${fpath}], anArr:`,{ancs, uIfB, uInPt, bInPt});
+      //console.log(tstData);
+      //console.log('in tstType');
     }, 
+    async tstJson() {
+      let jst = JSON5Stringify(User);
+      console.log({jst});
+    },
   async insEnt() {
     let ds = await getToDataSource({entities:[Place]});
     //let placeRepo =  await ds.getRepository(Place);

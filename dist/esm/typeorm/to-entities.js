@@ -16,6 +16,10 @@ import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Bas
  * Enhanced BaseEntity
  */
 export class PkBaseEntity extends BaseEntity {
+    id;
+    createdAt;
+    updatedAt;
+    edata; //Whatever JSON data an entity wants...
     /**
      *  Returns the table name for this entity type
      * @returns string - table name of the entity
@@ -54,6 +58,10 @@ __decorate([
     __metadata("design:type", Object)
 ], PkBaseEntity.prototype, "edata", void 0);
 export class PkBaseUser extends PkBaseEntity {
+    email;
+    name;
+    pwd;
+    udata;
     // @ts-ignore
     virtc() { this.virtne = `NAMEEMAIL: ${this.email} ${this.name}`; }
     get namemail() {
@@ -89,6 +97,9 @@ __decorate([
  * Idea is to automatically create the geopont from lat, lon, and add "distance" query
  */
 export class Location {
+    lat;
+    lon;
+    geopt;
     static getWhats() {
         return "That's what";
     }
