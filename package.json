@@ -9,19 +9,19 @@
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",
-      "default": "./dist/cjs/index.js",
+      "default": "./dist/esm/index.js",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
     "./pkfaker": {
       "types": "./dist/esm/pkfaker/index.d.ts",
-      "default": "./dist/cjs/pkfaker/index.js",
+      "default": "./dist/esm/pkfaker/index.js",
       "import": "./dist/esm/pkfaker/index.js",
       "require": "./dist/cjs/pkfaker/index.js"
     },
     "./typeorm": {
       "types": "./dist/esm/typeorm/index.d.ts",
-      "default": "./dist/cjs/typeorm/index.js",
+      "default": "./dist/esm/typeorm/index.js",
       "import": "./dist/esm/typeorm/index.js",
       "require": "./dist/cjs/typeorm/index.js"
     },
