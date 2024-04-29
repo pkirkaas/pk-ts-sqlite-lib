@@ -31,7 +31,7 @@ export class PkDataSource extends DataSource {
       entity = entities[entityName];
     }
     let toEnt = typeOf(entity);
-    console.log({toEnt});
+    //console.log({toEnt});
     if (isEntityClass(entity)) {
       return entity;
     }
@@ -174,7 +174,7 @@ export async function resetToDataSource(ToConfig:GenObj = {}) {
   let config:DataSourceOptions = {...defaultToConfig, ...ToConfig, synchronize:true, dropSchema:true,};
   // @ts-ignore
   if (AppDataSource === null) {
-    console.log(`Trying to initialze DA w.`, {config});
+    //console.log(`Trying to initialze DA w.`, {config});
     AppDataSource = new PkDataSource(config);
     await AppDataSource.initialize();
   }
@@ -206,7 +206,7 @@ export async function origResetToDataSource(ToConfig:GenObj = {}) {
   // @ts-ignore
   config.entities = [];
   if (AppDataSource === null) {
-    console.log(`Trying to initialze DA w.`, {config});
+    //console.log(`Trying to initialze DA w.`, {config});
     AppDataSource = new PkDataSource(config);
     await AppDataSource.initialize();
     await AppDataSource.synchronize(true);
