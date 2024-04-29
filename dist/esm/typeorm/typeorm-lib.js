@@ -1,12 +1,36 @@
 /**
  * TypeORM library convenient functions
  */
+/**
+ * Every app using this should export an entities object: export const entities = {User, Post, Comment,...}
+ */
 import "reflect-metadata";
 export * from './to-entities.js';
 //import "reflect-metadata";
-import { PkError, } from './index.js';
+import { isSubclassOf, isObject, firstToUpper } from 'pk-ts-common-lib';
+import { typeOf, PkError, } from './index.js';
 //import { PkBaseEntity } from './to-entities.js';
-import { DataSource, } from "typeorm";
+import { DataSource, BaseEntity, } from "typeorm";
+export class PkDataSource extends DataSource {
+    getEntities() {
+        let entities = this.options.entities;
+        return entities;
+    }
+    getEntity(entity) {
+        if (typeof entity === 'string') {
+            let entities = this.options.entities;
+            let entityName = firstToUpper(entity);
+            //console.log({entity, entityName})
+            entity = entities[entityName];
+        }
+        let toEnt = typeOf(entity);
+        console.log({ toEnt });
+        if (isEntityClass(entity)) {
+            return entity;
+        }
+        throw new PkError(`Oh, bad entity!`, { entity });
+    }
+}
 export let AppDataSource = null;
 export let sqliteToConfig = {
     type: 'sqlite',
@@ -31,6 +55,35 @@ export let postgresToConfig = {
     database: process.env.PG_DB,
     synchronize: true,
 };
+/**
+ * Returns an entity class from a string|Entity object of entites - {User, Post, ...}
+ * @param entity string|Entity - if string, key to entity class in entities
+ * @param src? DataSource, object of entities, or empty for default data source
+ *
+ */
+export function getEntity(entity, src) {
+    if (isEntityClass(entity)) {
+        return entity;
+    }
+    let entities;
+    if (!src) {
+        src = AppDataSource;
+    }
+    if (src instanceof DataSource) {
+        entities = src.options.entities;
+    }
+    else if (isObject(src)) {
+        entities = src;
+    }
+    else {
+        throw new PkError(`Invalid source for entities:`, { src });
+    }
+    if (typeof entity === "string") {
+        let entityName = firstToUpper(entity);
+        entity = this.options.entities[entityName];
+    }
+    return false;
+}
 //let defaultToConfig:DataSourceOptions = mySqlToConfig;
 export let defaultToConfig = postgresToConfig;
 /**
@@ -42,7 +95,7 @@ export async function getToDataSource(ToConfig = {}) {
     let config = { ...defaultToConfig, ...ToConfig };
     if (AppDataSource === null) {
         //console.log(`Trying to initialze DA w.`, {config});
-        AppDataSource = new DataSource(config);
+        AppDataSource = new PkDataSource(config);
         await AppDataSource.initialize();
     }
     if (!AppDataSource.isInitialized) {
@@ -81,19 +134,43 @@ export function mkPoint(src) {
     };
     return point;
 }
+/**
+ * Is the arg an Entity class (not instance)
+ * @param obj
+ */
+export function isEntityClass(obj) {
+    let res = isSubclassOf(obj, BaseEntity);
+    return res;
+}
+/** Returns the entity class of an entity instance, or false
+ * @param obj
+ */
+export function isEntityInstance(obj) {
+    if (obj instanceof BaseEntity) {
+        return Object.getPrototypeOf(obj).constructor;
+    }
+    return false;
+}
 // Test if dropSchema works as expected
 export async function resetToDataSource(ToConfig = {}) {
     let config = { ...defaultToConfig, ...ToConfig, synchronize: true, dropSchema: true, };
     // @ts-ignore
     if (AppDataSource === null) {
         console.log(`Trying to initialze DA w.`, { config });
-        AppDataSource = new DataSource(config);
+        AppDataSource = new PkDataSource(config);
         await AppDataSource.initialize();
     }
     if (!AppDataSource.isInitialized) {
         throw new PkError("TO DataSource not initialized, w. config:", { config });
     }
     return AppDataSource;
+}
+export function getEntities(ds) {
+    if (!ds) {
+        ds = AppDataSource;
+    }
+    let entities = ds.options.entities;
+    return entities;
 }
 /**
  * ONLY FOR TEST/DEV !!!!
@@ -109,7 +186,7 @@ export async function origResetToDataSource(ToConfig = {}) {
     config.entities = [];
     if (AppDataSource === null) {
         console.log(`Trying to initialze DA w.`, { config });
-        AppDataSource = new DataSource(config);
+        AppDataSource = new PkDataSource(config);
         await AppDataSource.initialize();
         await AppDataSource.synchronize(true);
         await AppDataSource.destroy();
@@ -122,5 +199,7 @@ export async function origResetToDataSource(ToConfig = {}) {
     return AppDataSource;
 }
 //export const AppDataSource = new DataSource(getTOConfig());
-//await AppDataSource.initialize();
+export default { resetToDataSource, isEntityInstance, AppDataSource, sqliteToConfig, mySqlToConfig, postgresToConfig,
+    getEntity, PkDataSource, defaultToConfig, getToDataSource, clearEntities, mkPoint, isEntityClass, getEntities,
+};
 //# sourceMappingURL=typeorm-lib.js.map

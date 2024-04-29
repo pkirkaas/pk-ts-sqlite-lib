@@ -6,8 +6,7 @@ import { runCli, resetToDataSource, getToDataSource, PkBaseEntity,
 AppDataSource, clearEntities, sqliteToConfig,
 //  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
  } from '../typeorm/index.js';
-import { dbgWrt, } from 'pk-ts-node-lib';
-import { getPrototypeChain, typeOfEach, typeOf, getAncestorArr, JSON5Stringify, getObjDets, objInfo, } from 'pk-ts-common-lib';
+import { isSubclassOf, typeOfEach, typeOf, JSON5Stringify, } from 'pk-ts-common-lib';
 import { Raw, BaseEntity, } from "typeorm";
 import { User, Post, mkUsers, Place, mkPlaceData, } from "../typeorm/to-test-e-s.js";
 import { pkfaker, } from '../pkfaker/index.js';
@@ -25,20 +24,49 @@ let set = { User, PkBaseEntity, BaseEntity };
 let tfncs = {
     async tstType() {
         let ds = await getToDataSource({ ...sqliteToConfig, entities });
+        let postEnt = ds.getEntity('post');
+        let lentities = ds.getEntities();
+        let sc = isSubclassOf(postEnt, BaseEntity);
+        //let entProps = allProps(lentities, 'tvp', 4);
+        //let lentities = typeormlib.getEntities();
+        //let entProps = allProps(lentities, 'tvp', 4);
+        //let path = dbgWrt(entProps);
+        console.log(typeOfEach({ postEnt, lentities }));
+        //let path = dbgWrt(typeOfEach({postEnt, lentities}));
+        /*
+        let dsEntities = ds.entities;
+        let dsOptEnts = ds.options.entities;
+        //let dsProps = allProps(ds, 'tvp', 3);
+        let doeProps = allProps(dsEntities, 'tvp', 3);
+        let dooProps = allProps(dsOptEnts, 'tvp', 3);
+        let path = dbgWrt({doeProps, dooProps});
+        */
+        //console.log({path});
+        /*
         let User = entities.User;
-        //      let set = {User, PkBaseEntity, BaseEntity};
+        let userRepo = User.getRepository();
+        // @ts-ignore
+        //let user = await userRepo.findOneBy({id:2});
+        let user = await User.findOneById(3);
+        let userProps = allProps(user, 'tvp', 3);
+        let instetypes = typeOfEach({user, User});
+        let path = dbgWrt({user, userProps,instetypes });
+  
+        //console.log({userProps, user});
+  //      let set = {User, PkBaseEntity, BaseEntity};
         let toe = typeOfEach(set);
         let pchain = getPrototypeChain(User);
         let ancs = getAncestorArr(User);
         let uDets = getObjDets(User);
-        let uInfo = objInfo(User, 'tpv', 3);
-        let tstData = { toe, pchain, uDets, uInfo };
+        let uInfo = objInfo(User,'tpv', 3);
+        let tstData = {toe, pchain, uDets, uInfo};
         let jData = JSON5Stringify(tstData);
-        let fpath = dbgWrt(tstData);
+        //let fpath = dbgWrt(tstData);
         let uIfB = (User instanceof BaseEntity);
         let uInPt = BaseEntity.prototype.isPrototypeOf(User.prototype);
         let bInPt = BaseEntity.prototype.isPrototypeOf(BaseEntity.prototype);
-        console.log(`Done: fpath: [${fpath}], anArr:`, { ancs, uIfB, uInPt, bInPt });
+        console.log(`Done: fpath: [${path}], anArr:`,{ancs, uIfB, uInPt, bInPt});
+        */
         //console.log(tstData);
         //console.log('in tstType');
     },
