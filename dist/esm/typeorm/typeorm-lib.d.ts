@@ -61,21 +61,4 @@ export declare function getEntities(ds?: DataSource): import("typeorm").MixedLis
  * @returns empty, initialized datasource
  */
 export declare function origResetToDataSource(ToConfig?: GenObj): Promise<any>;
-declare const _default: {
-    resetToDataSource: typeof resetToDataSource;
-    isEntityInstance: typeof isEntityInstance;
-    AppDataSource: any;
-    sqliteToConfig: import("typeorm/driver/sqlite/SqliteConnectionOptions.js").SqliteConnectionOptions;
-    mySqlToConfig: import("typeorm/driver/mysql/MysqlConnectionOptions.js").MysqlConnectionOptions;
-    postgresToConfig: import("typeorm/driver/postgres/PostgresConnectionOptions.js").PostgresConnectionOptions;
-    getEntity: typeof getEntity;
-    PkDataSource: typeof PkDataSource;
-    defaultToConfig: import("typeorm/driver/postgres/PostgresConnectionOptions.js").PostgresConnectionOptions;
-    getToDataSource: typeof getToDataSource;
-    clearEntities: typeof clearEntities;
-    mkPoint: typeof mkPoint;
-    isEntityClass: typeof isEntityClass;
-    getEntities: typeof getEntities;
-};
-export default _default;
 //# sourceMappingURL=typeorm-lib.d.ts.map

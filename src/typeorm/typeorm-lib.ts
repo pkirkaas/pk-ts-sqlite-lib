@@ -223,9 +223,12 @@ export async function origResetToDataSource(ToConfig:GenObj = {}) {
 //export const AppDataSource = new DataSource(getTOConfig());
 
 
+/*
 export default {resetToDataSource, isEntityInstance, AppDataSource, sqliteToConfig, mySqlToConfig, postgresToConfig,
   getEntity, PkDataSource, defaultToConfig, getToDataSource, clearEntities, mkPoint, isEntityClass,  getEntities,
+  
 };
+*/
 
 
 
