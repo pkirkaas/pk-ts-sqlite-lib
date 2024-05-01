@@ -54,13 +54,23 @@
     "tsconfig-paths": "*",
     "date-fns": "*",
     "@types/sqlite3": "*",
+    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
+    "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
     "mysql2": "*",
     "pg": "^8.11.3",
-    "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
-    "pk-ts-common-lib": "git+https://github.com/pkirkaas/pk-ts-common-lib.git#working",
     "prisma": "*",
     "sqlite": "*",
     "sqlite3": "*",
     "typeorm": "*"
-  }
+  },
+    "alt-lib-gits" : [ {
+    "pk-ts-common-lib": "git+https://github.com/pkirkaas/pk-ts-common-lib.git#working",
+    "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
+  "no":"nothing"},{
+    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
+    "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
+  "no":"nothing"},{
+  "no":"nothing"},{
+  "no":"nothing"},{
+  "no":"nothing"}]
 }
