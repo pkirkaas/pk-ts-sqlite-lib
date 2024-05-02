@@ -12,6 +12,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import "reflect-metadata";
 import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, AfterLoad, } from "typeorm";
+import { IsEmail, } from "class-validator";
 /**
  * Enhanced BaseEntity
  */
@@ -70,6 +71,7 @@ export class PkBaseUser extends PkBaseEntity {
 }
 __decorate([
     Column({ nullable: true, unique: true, }),
+    IsEmail(),
     __metadata("design:type", String)
 ], PkBaseUser.prototype, "email", void 0);
 __decorate([

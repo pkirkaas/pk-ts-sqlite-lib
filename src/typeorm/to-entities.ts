@@ -10,6 +10,7 @@ import {
 
 } from "typeorm";
 
+import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, } from "class-validator";
 /**
  * Enhanced BaseEntity 
  */
@@ -43,7 +44,7 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 }
 
 export abstract class PkBaseUser extends PkBaseEntity {
-	@Column({ nullable: true, unique: true, }) email: string;
+	@Column({ nullable: true, unique: true, }) @IsEmail() email: string;
 	@Column({nullable: true, default:"Default Name"}) name: string;
 	@Column({ nullable: true }) pwd: string;
 	@Column({nullable:true, type:"json"}) udata;

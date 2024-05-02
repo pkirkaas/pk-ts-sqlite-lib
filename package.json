@@ -36,7 +36,7 @@
     "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.cjs.json",
     "monitor": "nodemon --exec \"npm run build\" --ext js,jsx,ts,tsx,sass,css --delay 5 --watch ./src",
     "pushdb": "npx prisma db push",
-    "linkdev" : "npm link pk-ts-node-lib pk-ts-common-lib",
+    "linkdev": "npm link pk-ts-node-lib pk-ts-common-lib",
     "seeddb": "npx prisma db seed",
     "generate": "npx prisma generate",
     "studio": "npx prisma studio",
@@ -49,28 +49,40 @@
     "@faker-js/faker": "*",
     "@prisma/client": "*",
     "@types/geojson": "^7946.0.14",
-    "lodash": "*",
-    "ts-node": "*",
-    "tsconfig-paths": "*",
-    "date-fns": "*",
     "@types/sqlite3": "*",
-    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
-    "pk-ts-node-lib": "github:pkirkaas/pk-ts-node-lib#working",
+    "class-validator": "^0.14.1",
+    "date-fns": "*",
+    "lodash": "*",
     "mysql2": "*",
     "pg": "^8.11.3",
+    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
+    "pk-ts-node-lib": "github:pkirkaas/pk-ts-node-lib#working",
     "prisma": "*",
     "sqlite": "*",
     "sqlite3": "*",
+    "ts-node": "*",
+    "tsconfig-paths": "*",
     "typeorm": "*"
   },
-    "alt-lib-gits" : [ {
-    "pk-ts-common-lib": "git+https://github.com/pkirkaas/pk-ts-common-lib.git#working",
-    "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
-  "no":"nothing"},{
-    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
-    "pk-ts-node-lib": "github:pkirkaas/pk-ts-node-lib#working",
-  "no":"nothing"},{
-  "no":"nothing"},{
-  "no":"nothing"},{
-  "no":"nothing"}]
+  "alt-lib-gits": [
+    {
+      "pk-ts-common-lib": "git+https://github.com/pkirkaas/pk-ts-common-lib.git#working",
+      "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
+      "no": "nothing"
+    },
+    {
+      "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
+      "pk-ts-node-lib": "github:pkirkaas/pk-ts-node-lib#working",
+      "no": "nothing"
+    },
+    {
+      "no": "nothing"
+    },
+    {
+      "no": "nothing"
+    },
+    {
+      "no": "nothing"
+    }
+  ]
 }
