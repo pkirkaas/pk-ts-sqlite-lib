@@ -3,6 +3,7 @@
  * Assumes Prisma has been initialized
  */
 
+/* Removing all prisma references
 import { Prisma, PrismaClient, } from '@prisma/client';
 import {
 	getFilePaths, slashPath, dbgWrt, ask, runCli, sassMapStringToJson, sassMapStringToObj, saveData, isFile, getOsType, isWindows, isLinux, runCommand, stdOut, winBashes, getSchema,
@@ -27,9 +28,6 @@ let testsFs = {
 	tstRels: async  function() {
 		let pmx = await getPrisma();
 		let a = 'b';
-		/*
-		let aclient = asEnumerable(prisma, 8);
-		*/
 		let schema = prisma.schema;
 		//let intr = await prisma.introspect();
 		let aePrisma = asEnumerable(Prisma,9);
@@ -136,24 +134,10 @@ let testsFs = {
 		//dbgWrt(usrModel);
 		console.log({  allFields});
 		//console.log({ usrModel });
-		/*
-		user.name = "Koala Nights";
-		let u2 = await user.save({ email: 'BBBZZZ@butts.com' });
-		await u2.connect('posts', 44 );
-		await u2.connect('posts', 37 );
-		u2.pwd = 'abcakbc';
-		*/
 		//let u3 = await u2.set('posts', [41, 61] );
 		//let u3 = await u2.disconnect('posts', 41 );
 		//let u3 = await u2.addRelationship('posts',  61 );
 		//let u4 = await u3.addRelationship('posts',  41 );
-		/*
-		//let ids = await prisma.user.getIds('anarg');
-		//let where = { name: 'Trevion' };
-		//let u2 = await user.save();
-		let u2 = await user.save;
-		let u3 = await u2.xsave;
-		*/
 		//let refresh = await prisma.user.byId(user, 'posts');
 		//let refresh = await prisma.user.byId(user);
 
@@ -222,3 +206,4 @@ let testsFs = {
 
 
 runCli(testsFs);
+*/

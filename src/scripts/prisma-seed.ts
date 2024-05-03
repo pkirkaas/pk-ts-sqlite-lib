@@ -2,6 +2,7 @@
  * Seed the test prisma tables - clear them first
  * Use faker, etc to generate data
  */
+/* Removing all Prisma references  
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import {
@@ -57,9 +58,6 @@ async function mkUsers(cnt = usrCnt) {
 }
 
 
-/** New main seed
- * 
- */
 
 async function tstJson() {
 	let usrData = mkUsrData(3);
@@ -142,3 +140,4 @@ let tstFncs = {
 //await tstJson();
 
 runCli(tstFncs);
+*/

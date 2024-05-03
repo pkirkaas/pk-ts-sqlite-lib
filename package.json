@@ -35,19 +35,11 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.cjs.json",
     "monitor": "nodemon --exec \"npm run build\" --ext js,jsx,ts,tsx,sass,css --delay 5 --watch ./src",
-    "pushdb": "npx prisma db push",
     "linkdev": "npm link pk-ts-node-lib pk-ts-common-lib",
-    "seeddb": "npx prisma db seed",
-    "generate": "npx prisma generate",
-    "studio": "npx prisma studio",
     "clean": "rm -rf ./dist ./node_modules package-lock.json && npm i"
-  },
-  "prisma": {
-    "seed": "node --loader  ts-node/esm ./prisma/seed.ts"
   },
   "dependencies": {
     "@faker-js/faker": "*",
-    "@prisma/client": "*",
     "@types/geojson": "^7946.0.14",
     "@types/sqlite3": "*",
     "class-validator": "^0.14.1",
@@ -57,7 +49,6 @@
     "pg": "^8.11.3",
     "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
     "pk-ts-node-lib": "github:pkirkaas/pk-ts-node-lib#working",
-    "prisma": "*",
     "sqlite": "*",
     "sqlite3": "*",
     "ts-node": "*",
@@ -66,6 +57,15 @@
   },
   "alt-lib-gits": [
     {
+    "pushdb": "npx prisma db push",
+    "generate": "npx prisma generate",
+    "seeddb": "npx prisma db seed",
+    "studio": "npx prisma studio",
+    "prisma-dir": {
+      "seed": "node --loader  ts-node/esm ./prisma/seed.ts"
+    },
+      "prisma": "*",
+      "@prisma/client": "*",
       "pk-ts-common-lib": "git+https://github.com/pkirkaas/pk-ts-common-lib.git#working",
       "pk-ts-node-lib": "git+https://github.com/pkirkaas/pk-ts-node-lib.git#working",
       "no": "nothing"
