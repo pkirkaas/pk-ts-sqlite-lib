@@ -133,7 +133,7 @@ __decorate([
 ], Post.prototype, "content", void 0);
 __decorate([
     ManyToOne(() => User, (user) => user.posts),
-    __metadata("design:type", User)
+    __metadata("design:type", Object)
 ], Post.prototype, "user", void 0);
 Post = __decorate([
     Entity()

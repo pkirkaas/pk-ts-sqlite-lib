@@ -115,11 +115,29 @@ export async function clearEntities(entities, dataSource = null) {
         ;
     }
     let repoMetadata = [];
+    let results = [];
+    let manager = dataSource.manager;
     for (let entity of entities) {
-        let repository = dataSource.getRepository(entity);
-        await repository.clear();
-        repoMetadata.push(await repository.metadata);
+        try {
+            let entityName = entity.name;
+            let result = { entityName };
+            let exists = await manager.exists(entity);
+            if (!exists) {
+                result.satus = "Entity not initialized - skipping";
+            }
+            else {
+                let repository = dataSource.getRepository(entity);
+                await repository.clear();
+                repoMetadata.push(await repository.metadata);
+                result.status = "Cleared Entity!";
+            }
+            results.push(result);
+        }
+        catch (e) {
+            console.error(`OH - caught an exception!`, { e });
+        }
     }
+    console.log({ results });
     return repoMetadata;
 }
 /**
@@ -199,7 +217,8 @@ export async function origResetToDataSource(ToConfig = {}) {
     return AppDataSource;
 }
 //export const AppDataSource = new DataSource(getTOConfig());
-export default { resetToDataSource, isEntityInstance, AppDataSource, sqliteToConfig, mySqlToConfig, postgresToConfig,
+export default {
+    resetToDataSource, isEntityInstance, AppDataSource, sqliteToConfig, mySqlToConfig, postgresToConfig,
     getEntity, PkDataSource, defaultToConfig, getToDataSource, clearEntities, mkPoint, isEntityClass, getEntities,
 };
 //# sourceMappingURL=typeorm-lib.js.map

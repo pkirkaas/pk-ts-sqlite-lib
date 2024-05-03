@@ -6,7 +6,7 @@
 import "reflect-metadata";
 import {
 	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
-	BaseEntity,  Point,
+	BaseEntity,  Point, type Relation,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 } from "typeorm";
 
@@ -48,7 +48,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 @Entity() export class User extends PkBaseUser {
 	//@Column({nullable:true, type:"geometry"}) lonlat:Point;
 	@Column({nullable:true,}) zip:string;;
-	@OneToMany(() => Post, (post) => post.user) posts: Post[];
+	@OneToMany(() => Post, (post) => post.user) posts: Relation<Post>[];
 }
 
 /*
@@ -67,7 +67,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 @Entity() export class Post extends PkBaseEntity {
 	@Column() title: string;
 	@Column() content: string;
-	@ManyToOne(() => User, (user) => user.posts) user?: User; //Weirdly had to make this optional for TS to compile
+	@ManyToOne(() => User, (user) => user.posts) user?: Relation<User>; //Weirdly had to make this optional for TS to compile
 }
 
 

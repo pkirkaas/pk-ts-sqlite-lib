@@ -7,7 +7,7 @@ import { BaseEntity, Point } from "typeorm";
  * Enhanced BaseEntity
  */
 export declare abstract class PkBaseEntity extends BaseEntity {
-    id: string;
+    id: number;
     createdAt: Date;
     updatedAt: Date;
     edata: any;

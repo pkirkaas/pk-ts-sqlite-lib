@@ -15,7 +15,7 @@ import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, } from "cla
  * Enhanced BaseEntity 
  */
 export abstract class PkBaseEntity extends BaseEntity { //All entities should extend this  
-	@PrimaryGeneratedColumn() id: string;
+	@PrimaryGeneratedColumn() id: number;
 	@CreateDateColumn() createdAt: Date;
 	@UpdateDateColumn() updatedAt: Date;
 	@Column({nullable:true, type:"json"}) edata; //Whatever JSON data an entity wants...

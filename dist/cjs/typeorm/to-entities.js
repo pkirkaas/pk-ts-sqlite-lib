@@ -44,7 +44,7 @@ export class PkBaseEntity extends BaseEntity {
 }
 __decorate([
     PrimaryGeneratedColumn(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], PkBaseEntity.prototype, "id", void 0);
 __decorate([
     CreateDateColumn(),

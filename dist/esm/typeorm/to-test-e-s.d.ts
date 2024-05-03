@@ -2,7 +2,7 @@
  * TypeORM test entities and seed functions
  */
 import "reflect-metadata";
-import { Point } from "typeorm";
+import { Point, type Relation } from "typeorm";
 import { GenObj, PkBaseEntity, PkBaseUser, Location } from '../typeorm/index.js';
 /**
  * US Locations based on zip code
@@ -24,12 +24,12 @@ export declare class Place extends PkBaseEntity {
 }
 export declare class User extends PkBaseUser {
     zip: string;
-    posts: Post[];
+    posts: Relation<Post>[];
 }
 export declare class Post extends PkBaseEntity {
     title: string;
     content: string;
-    user?: User;
+    user?: Relation<User>;
 }
 export declare function mkPlaceData(state?: string): GenObj;
 export declare function mkPlaces(cnt?: number): Promise<void>;
