@@ -47,7 +47,6 @@
     "lodash": "*",
     "mysql2": "*",
     "pg": "^8.11.3",
-    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
     "pk-ts-node-lib": "github:pkirkaas/pk-ts-node-lib#working",
     "sqlite": "*",
     "sqlite3": "*",
@@ -76,6 +75,7 @@
       "no": "nothing"
     },
     {
+    "pk-ts-common-lib": "github:pkirkaas/pk-ts-common-lib#working",
       "no": "nothing"
     },
     {
