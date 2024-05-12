@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import "reflect-metadata";
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, AfterLoad, } from "typeorm";
+import { PrimaryGeneratedColumn, DeleteDateColumn, Column, CreateDateColumn, UpdateDateColumn, BaseEntity, AfterLoad, } from "typeorm";
 import { IsEmail, } from "class-validator";
 /**
  * Enhanced BaseEntity
@@ -20,6 +20,7 @@ export class PkBaseEntity extends BaseEntity {
     id;
     createdAt;
     updatedAt;
+    deletedAt;
     edata; //Whatever JSON data an entity wants...
     /**
      *  Returns the table name for this entity type
@@ -54,6 +55,10 @@ __decorate([
     UpdateDateColumn(),
     __metadata("design:type", Date)
 ], PkBaseEntity.prototype, "updatedAt", void 0);
+__decorate([
+    DeleteDateColumn(),
+    __metadata("design:type", Date)
+], PkBaseEntity.prototype, "deletedAt", void 0);
 __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)

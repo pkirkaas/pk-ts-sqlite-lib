@@ -4,7 +4,7 @@
 
 import "reflect-metadata";
 import {
-	Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
+	Entity, PrimaryGeneratedColumn, DeleteDateColumn, Column, CreateDateColumn, UpdateDateColumn,
 	BaseEntity,  Point, QueryBuilder, VirtualColumn, AfterLoad,
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 
@@ -18,6 +18,7 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 	@PrimaryGeneratedColumn() id: number;
 	@CreateDateColumn() createdAt: Date;
 	@UpdateDateColumn() updatedAt: Date;
+	@DeleteDateColumn() deletedAt: Date;
 	@Column({nullable:true, type:"json"}) edata; //Whatever JSON data an entity wants...
 
 	/**
@@ -42,6 +43,7 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 		return qb;
 	}
 }
+
 
 export abstract class PkBaseUser extends PkBaseEntity {
 	@Column({ nullable: true, unique: true, }) @IsEmail() email: string;

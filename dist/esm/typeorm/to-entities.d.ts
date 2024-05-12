@@ -10,6 +10,7 @@ export declare abstract class PkBaseEntity extends BaseEntity {
     id: number;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date;
     edata: any;
     /**
      *  Returns the table name for this entity type
