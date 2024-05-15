@@ -3,11 +3,7 @@
  */
 
 import {runCli, resetToDataSource, getToDataSource, PkBaseEntity, 
-  //typeOf,
-  AppDataSource,emptySqliteTables, PkDataSource, 
-  //writeData, 
-  haversine, clearEntities,sqliteToConfig, typeormlib,
-//  saveData, JSON5Stringify, allProps, allPropsWithTypes, getObjDets, objInfo, 
+  AppDataSource,emptySqliteTables, PkDataSource, haversine, clearEntities,sqliteToConfig, typeormlib,
 } from '../typeorm/index.js';
 
   
@@ -16,7 +12,7 @@ import {runCli, resetToDataSource, getToDataSource, PkBaseEntity,
     writeData, writeFile, 
   } from 'pk-ts-node-lib';
 
-import {  //saveData, 
+import {
   isClassOrFunction,isSubclassOf, classStack, getPrototypeChain,  typeOfEach, typeOf, JSON5, getAncestorArr,
   JSON5Stringify, JSONStringify, allProps, allPropsWithTypes, getObjDets, objInfo, getProps, subObj,
    } from 'pk-ts-common-lib';
@@ -44,12 +40,6 @@ import { //MtBase, MtChild1, MtChild2, MtUser,
 let entities = {Post, User,};
 
 let set = {User, PkBaseEntity, BaseEntity};
-//let entities = [Post, User,];
-
-//AppDataSource.setOptions(entities);
-
-//await AppDataSource.synchronize(true);
-//await AppDataSource.initialize();
 
 let tfncs = {
     async tstType() {
@@ -57,48 +47,7 @@ let tfncs = {
       let postEnt = ds.getEntity('post');
       let lentities = ds.getEntities();
       let sc = isSubclassOf(postEnt, BaseEntity);
-      //let entProps = allProps(lentities, 'tvp', 4);
-      //let lentities = typeormlib.getEntities();
-      //let entProps = allProps(lentities, 'tvp', 4);
-      //let path = dbgWrt(entProps);
       console.log(typeOfEach({postEnt, lentities}));
-      //let path = dbgWrt(typeOfEach({postEnt, lentities}));
-      /*
-      let dsEntities = ds.entities;
-      let dsOptEnts = ds.options.entities;
-      //let dsProps = allProps(ds, 'tvp', 3);
-      let doeProps = allProps(dsEntities, 'tvp', 3);
-      let dooProps = allProps(dsOptEnts, 'tvp', 3);
-      let path = dbgWrt({doeProps, dooProps});
-      */
-      //console.log({path});
-      /*
-      let User = entities.User; 
-      let userRepo = User.getRepository();
-      // @ts-ignore
-      //let user = await userRepo.findOneBy({id:2});
-      let user = await User.findOneById(3);
-      let userProps = allProps(user, 'tvp', 3);
-      let instetypes = typeOfEach({user, User});
-      let path = dbgWrt({user, userProps,instetypes });
-
-      //console.log({userProps, user});
-//      let set = {User, PkBaseEntity, BaseEntity};
-      let toe = typeOfEach(set);
-      let pchain = getPrototypeChain(User);
-      let ancs = getAncestorArr(User);
-      let uDets = getObjDets(User);
-      let uInfo = objInfo(User,'tpv', 3);
-      let tstData = {toe, pchain, uDets, uInfo};
-      let jData = JSON5Stringify(tstData);
-      //let fpath = dbgWrt(tstData);
-      let uIfB = (User instanceof BaseEntity);
-      let uInPt = BaseEntity.prototype.isPrototypeOf(User.prototype);
-      let bInPt = BaseEntity.prototype.isPrototypeOf(BaseEntity.prototype);
-      console.log(`Done: fpath: [${path}], anArr:`,{ancs, uIfB, uInPt, bInPt});
-      */
-      //console.log(tstData);
-      //console.log('in tstType');
     }, 
     async tstJson() {
       let jst = JSON5Stringify(User);
@@ -111,20 +60,6 @@ let tfncs = {
     let pTN = Place.getTableName();
     let nqb = Place.newQueryBuilder();
     console.log({pTN, nqb});
-    /*
-    let repoMetadata = placeRepo.metadata;
-    let tableName = repoMetadata.tableName;
-    let repoDets =  allProps(placeRepo, 'tvp', 3);
-    //console.log({Place, placeRepo});
-    let placeJS = JSON5Stringify(Place);
-    //let placeDets = allPropsWithTypes(Place);
-    //let placeDets = objInfo(Place);
-    let placeDets = allProps(Place, 'tvp', 3);
-    saveData(placeDets,{fname:'PlaceData'});
-    saveData(repoDets,{fname:'RepoData'});
-    //console.log({Place});
-    console.log({placeJS, repoMetadata, tableName});
-    */
   },
   async tstInit() {
     let ds = await getToDataSource({...sqliteToConfig, entities});
@@ -169,14 +104,36 @@ let tfncs = {
     console.log({ts});
   },
 
+  async tstVal() {
+    let ds = await getToDataSource({entities:[User,Post]});
+    let postData = {
+      title: "The title of my which is way too long... post",
+      content: "Proposd Post Content",
+    }
+    
+    let serrs = await Post.errors(postData);
+    postData.title ="A shorter title";
+    //@ts-ignore
+    let tmpPost = Post.create(postData);
+    
+    //@ts-ignore
+    let tmpPERR = await tmpPost.errors();
+    //let errs = await Post.validateData('tiger');
+    console.log(`Errs from post validations:`,{serrs, tmpPost, tmpPERR,});
+  },
   async tstUsr() {
     let ds = await getToDataSource({entities:[User,Post]});
     let usrs = await User.newQueryBuilder().getMany();
+    let usr = usrs[0];
+    let usrProps = getProps(usr,true);
+    console.log({usr, usrProps});
+    /*
     let usrsJ = JSON.stringify(usrs,null,2);
     let usrsP = JSON.parse(usrsJ);
     //let ts = await fetchStUsr();
     let nameemail = usrs[0].namemail;
     console.log({usrs, nameemail, usrsJ, usrsP});
+    */
   },
 
   async tstSt() {

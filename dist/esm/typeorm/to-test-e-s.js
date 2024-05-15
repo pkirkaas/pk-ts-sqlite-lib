@@ -13,7 +13,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import "reflect-metadata";
 import { Entity, Column, OneToMany, ManyToOne, } from "typeorm";
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
-import { PkBaseEntity, typeOf, haversine, PkBaseUser, mkPoint, Location, } from '../typeorm/index.js';
+import { PkBaseEntity, typeOf, haversine, PkBaseUser, mkPoint, Location, rules, } from '../typeorm/index.js';
 import { faker } from '@faker-js/faker';
 import { pkfaker, } from '../pkfaker/index.js';
 // Create Test Entities
@@ -125,6 +125,7 @@ let Post = class Post extends PkBaseEntity {
 };
 __decorate([
     Column(),
+    rules.Length(10, 20),
     __metadata("design:type", String)
 ], Post.prototype, "title", void 0);
 __decorate([

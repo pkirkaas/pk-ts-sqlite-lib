@@ -10,10 +10,14 @@ import {
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 } from "typeorm";
 
+
+import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, validate, ValidatorOptions,} from "class-validator";
+
+
 //import { PkBaseEntity } from "../typeorm/to-entities.js";
 
 import {runCli, GenObj, getToDataSource, PkBaseEntity, typeOf, AppDataSource,emptySqliteTables,
-	haversine, PkBaseUser, mkPoint, resetToDataSource, origResetToDataSource, Location,
+	haversine, PkBaseUser, mkPoint, resetToDataSource, origResetToDataSource, Location, rules,
 } from '../typeorm/index.js';
 
 
@@ -65,7 +69,7 @@ import {pkfaker ,} from '../pkfaker/index.js';
 */
 
 @Entity() export class Post extends PkBaseEntity {
-	@Column() title: string;
+	@Column() @rules.Length(10, 20) title: string;
 	@Column() content: string;
 	@ManyToOne(() => User, (user) => user.posts) user?: Relation<User>; //Weirdly had to make this optional for TS to compile
 }

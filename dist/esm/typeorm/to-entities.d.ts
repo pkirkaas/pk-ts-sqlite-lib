@@ -3,6 +3,19 @@
  */
 import "reflect-metadata";
 import { BaseEntity, Point } from "typeorm";
+import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, validate, ValidatorOptions } from "class-validator";
+export declare const rules: {
+    Contains: typeof Contains;
+    IsInt: typeof IsInt;
+    Length: typeof Length;
+    IsEmail: typeof IsEmail;
+    IsFQDN: typeof IsFQDN;
+    IsDate: typeof IsDate;
+    Min: typeof Min;
+    Max: typeof Max;
+    validate: typeof validate;
+};
+import { GenObj } from 'pk-ts-common-lib';
 /**
  * Enhanced BaseEntity
  */
@@ -22,7 +35,20 @@ export declare abstract class PkBaseEntity extends BaseEntity {
      * CAN USE JUST andWhere, don't need to start w. where
      * @returns queryBulder for this entity
      */
-    static newQueryBuilder(): any;
+    static newQueryBuilder(findOpts?: any): any;
+    /**
+     * Validate the current instance according to class-validator rules
+     * @param vOpts:ValidatorOptions - opts for the validator library
+     * @param opts:GenObj - optional params for this function
+     *
+     */
+    /**
+     * Takes proposed instance data object, creates a new instance, validates it,
+     * and returns result
+     *  - an array of validation errors, or
+     */
+    static errors(data: any, vOpts?: ValidatorOptions, opts?: GenObj): Promise<any>;
+    errors(vOpts?: ValidatorOptions, opts?: GenObj): Promise<false | import("class-validator").ValidationError[]>;
 }
 export declare abstract class PkBaseUser extends PkBaseEntity {
     email: string;

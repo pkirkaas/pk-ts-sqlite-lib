@@ -5,12 +5,18 @@
 import "reflect-metadata";
 import {
 	Entity, PrimaryGeneratedColumn, DeleteDateColumn, Column, CreateDateColumn, UpdateDateColumn,
-	BaseEntity,  Point, QueryBuilder, VirtualColumn, AfterLoad,
+	BaseEntity,  Point, QueryBuilder, VirtualColumn, AfterLoad, FindOptions, 
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 
 } from "typeorm";
 
-import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, } from "class-validator";
+import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, validate, ValidatorOptions,} from "class-validator";
+
+export const rules =  { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, validate, };
+
+
+
+import {GenObj, typeOf,} from 'pk-ts-common-lib';
 /**
  * Enhanced BaseEntity 
  */
@@ -35,12 +41,47 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 	 * CAN USE JUST andWhere, don't need to start w. where
 	 * @returns queryBulder for this entity
 	 */
-	static newQueryBuilder():any {
+	//static newQueryBuilder(findOpts?:FindOptions):any {
+	static newQueryBuilder(findOpts?:any):any {
 	//static newQueryBuilder():QueryBuilder<any> {
 		let tableName = this.getTableName();
 		// @ts-ignore
 		let qb = this.createQueryBuilder(tableName);
+		if (findOpts) {
+			qb.setFindOptions(findOpts);
+		}
 		return qb;
+	}
+	/**
+	 * Validate the current instance according to class-validator rules
+	 * @param vOpts:ValidatorOptions - opts for the validator library
+	 * @param opts:GenObj - optional params for this function
+	 * 
+	 */
+
+	/**
+	 * Takes proposed instance data object, creates a new instance, validates it,
+	 * and returns result
+	 *  - an array of validation errors, or 
+	 */
+	static async  errors(data:any, vOpts?:ValidatorOptions, opts?:GenObj) {
+		try {
+		//@ts-ignore
+		let instance = this.create(data);
+		//@ts-ignore
+		let res = await instance.errors(vOpts, opts);
+		return res;
+		} catch (err) {
+			return err;
+		}
+	};
+
+	async errors(vOpts?:ValidatorOptions, opts?:GenObj) {
+		let errors = await validate(this,vOpts);
+		if (errors.length) {
+			return errors;
+		}
+		return false; // ?? what should success return?
 	}
 }
 
