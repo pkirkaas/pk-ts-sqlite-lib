@@ -114,6 +114,7 @@ export async function clearEntities(entities, dataSource = null) {
         dataSource = await getToDataSource();
         ;
     }
+    await dataSource.query("PRAGMA foreign_keys = OFF;");
     let repoMetadata = [];
     let results = [];
     let manager = dataSource.manager;
@@ -137,6 +138,7 @@ export async function clearEntities(entities, dataSource = null) {
             console.error(`OH - caught an exception!`, { e });
         }
     }
+    await dataSource.query("PRAGMA foreign_keys = ON;");
     console.log({ results });
     return repoMetadata;
 }

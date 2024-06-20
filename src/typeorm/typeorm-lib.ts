@@ -17,7 +17,7 @@ import { GenObj, typeOf, isEmpty, PkError, } from './index.js';
 
 //import { PkBaseEntity } from './to-entities.js';
 
-import { Entity, DataSource, BaseEntity, DataSourceOptions, Point, } from "typeorm";
+import { getConnection, Entity, DataSource, BaseEntity, DataSourceOptions, Point, } from "typeorm";
 export class PkDataSource extends DataSource {
   getEntities(): GenObj {
     let entities = this.options.entities;
@@ -128,6 +128,7 @@ export async function clearEntities(entities: any[], dataSource: any = null) {
     //dataSource = AppDataSource;
     dataSource = await getToDataSource();;
   }
+  await dataSource.query("PRAGMA foreign_keys = OFF;");
   let repoMetadata = [];
   let results = [];
   let manager = dataSource.manager;
@@ -150,6 +151,7 @@ export async function clearEntities(entities: any[], dataSource: any = null) {
       console.error(`OH - caught an exception!`,{e});
     }
   }
+  await dataSource.query("PRAGMA foreign_keys = ON;");
   console.log({ results });
   return repoMetadata;
 }
