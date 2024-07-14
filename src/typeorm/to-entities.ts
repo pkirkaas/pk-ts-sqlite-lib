@@ -4,7 +4,7 @@
 
 import "reflect-metadata";
 import {
-	Entity, PrimaryGeneratedColumn, DeleteDateColumn, Column, CreateDateColumn, UpdateDateColumn,
+	Entity, PrimaryGeneratedColumn, DeleteDateColumn, Column, CreateDateColumn, UpdateDateColumn, ObjectLiteral, WhereExpressionBuilder, 
 	BaseEntity,  Point, QueryBuilder, VirtualColumn, AfterLoad, FindOptions, 
 	OneToMany, ManyToOne, JoinColumn, JoinTable,
 
@@ -44,9 +44,11 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 	//static newQueryBuilder(findOpts?:FindOptions):any {
 	static newQueryBuilder(findOpts?:any):any {
 	//static newQueryBuilder():QueryBuilder<any> {
-		let tableName = this.getTableName();
+		//let tableName = this.getTableName();
 		// @ts-ignore
-		let qb = this.createQueryBuilder(tableName);
+		//let qb = this.createQueryBuilder(tableName);
+		// NEW - the above works, but if below works, it's cleaner...
+		let qb = this.getRepository().createQueryBuilder();
 		if (findOpts) {
 			qb.setFindOptions(findOpts);
 		}
@@ -83,6 +85,85 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 		}
 		return false; // ?? what should success return?
 	}
+
+	// Try with options
+	  async loadRelation<T extends BaseEntity>(
+			this: T, 
+			relationName: string,
+			options: {
+				where?: ObjectLiteral | ((qb: WhereExpressionBuilder) => void),
+				order?: { [key: string]: 'ASC' | 'DESC' },
+				limit?: number,
+				offset?: number,
+			} = {}
+		): Promise<T> {
+    const metadata = (this.constructor as any).getRepository().metadata;
+    const relation = metadata.findRelationWithPropertyPath(relationName);
+
+    if (!relation) {
+      throw new Error(`Relation ${relationName} not found in ${metadata.name}`);
+    }
+
+    //const queryBuilder = (this as any).getConnection()
+    const queryBuilder = (this.constructor as any).getRepository()
+      .createQueryBuilder()
+      .relation(metadata.target, relationName)
+      .of(this);
+
+			
+			if (options.where) {
+				if (typeof options.where === 'function') {
+					options.where(queryBuilder);
+				} else {
+					queryBuilder.where(options.where);
+				}
+			}
+	
+			if (options.order) {
+				queryBuilder.orderBy(options.order);
+			}
+	
+			if (options.limit) {
+				queryBuilder.limit(options.limit);
+			}
+			if (options.offset) {
+				queryBuilder.offset(options.offset);
+			}
+	
+	
+
+    const relatedEntities = await queryBuilder.loadMany();
+
+    (this as T)[relationName] = relation.isManyToOne ? relatedEntities[0] : relatedEntities;
+
+    return this;
+  }
+
+	/** Works - but about to try with options... */
+	/*
+	  async loadRelationNoOpts<T extends BaseEntity>(this: T, relationName: string): Promise<T> {
+    //const metadata = (this as any).getConnection().getMetadata(this.constructor);
+    const metadata = (this.constructor as any).getRepository().metadata;
+    const relation = metadata.findRelationWithPropertyPath(relationName);
+
+    if (!relation) {
+      throw new Error(`Relation ${relationName} not found in ${metadata.name}`);
+    }
+
+    //const queryBuilder = (this as any).getConnection()
+    const queryBuilder = (this.constructor as any).getRepository()
+      .createQueryBuilder()
+      .relation(metadata.target, relationName)
+      .of(this);
+
+    const relatedEntities = await queryBuilder.loadMany();
+
+    (this as T)[relationName] = relation.isManyToOne ? relatedEntities[0] : relatedEntities;
+
+    return this;
+  }
+		*/
+
 }
 
 

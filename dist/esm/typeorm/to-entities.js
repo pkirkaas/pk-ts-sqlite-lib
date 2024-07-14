@@ -39,9 +39,11 @@ export class PkBaseEntity extends BaseEntity {
     //static newQueryBuilder(findOpts?:FindOptions):any {
     static newQueryBuilder(findOpts) {
         //static newQueryBuilder():QueryBuilder<any> {
-        let tableName = this.getTableName();
+        //let tableName = this.getTableName();
         // @ts-ignore
-        let qb = this.createQueryBuilder(tableName);
+        //let qb = this.createQueryBuilder(tableName);
+        // NEW - the above works, but if below works, it's cleaner...
+        let qb = this.getRepository().createQueryBuilder();
         if (findOpts) {
             qb.setFindOptions(findOpts);
         }
@@ -77,6 +79,39 @@ export class PkBaseEntity extends BaseEntity {
             return errors;
         }
         return false; // ?? what should success return?
+    }
+    // Try with options
+    async loadRelation(relationName, options = {}) {
+        const metadata = this.constructor.getRepository().metadata;
+        const relation = metadata.findRelationWithPropertyPath(relationName);
+        if (!relation) {
+            throw new Error(`Relation ${relationName} not found in ${metadata.name}`);
+        }
+        //const queryBuilder = (this as any).getConnection()
+        const queryBuilder = this.constructor.getRepository()
+            .createQueryBuilder()
+            .relation(metadata.target, relationName)
+            .of(this);
+        if (options.where) {
+            if (typeof options.where === 'function') {
+                options.where(queryBuilder);
+            }
+            else {
+                queryBuilder.where(options.where);
+            }
+        }
+        if (options.order) {
+            queryBuilder.orderBy(options.order);
+        }
+        if (options.limit) {
+            queryBuilder.limit(options.limit);
+        }
+        if (options.offset) {
+            queryBuilder.offset(options.offset);
+        }
+        const relatedEntities = await queryBuilder.loadMany();
+        this[relationName] = relation.isManyToOne ? relatedEntities[0] : relatedEntities;
+        return this;
     }
 }
 __decorate([

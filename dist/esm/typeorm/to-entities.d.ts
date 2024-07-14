@@ -2,7 +2,7 @@
  * Building a library of enhanced TypeORM Entities
  */
 import "reflect-metadata";
-import { BaseEntity, Point } from "typeorm";
+import { ObjectLiteral, WhereExpressionBuilder, BaseEntity, Point } from "typeorm";
 import { Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max, validate, ValidatorOptions } from "class-validator";
 export declare const rules: {
     Contains: typeof Contains;
@@ -49,6 +49,14 @@ export declare abstract class PkBaseEntity extends BaseEntity {
      */
     static errors(data: any, vOpts?: ValidatorOptions, opts?: GenObj): Promise<any>;
     errors(vOpts?: ValidatorOptions, opts?: GenObj): Promise<false | import("class-validator").ValidationError[]>;
+    loadRelation<T extends BaseEntity>(this: T, relationName: string, options?: {
+        where?: ObjectLiteral | ((qb: WhereExpressionBuilder) => void);
+        order?: {
+            [key: string]: 'ASC' | 'DESC';
+        };
+        limit?: number;
+        offset?: number;
+    }): Promise<T>;
 }
 export declare abstract class PkBaseUser extends PkBaseEntity {
     email: string;

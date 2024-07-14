@@ -87,12 +87,30 @@ let tfncs = {
         //let errs = await Post.validateData('tiger');
         console.log(`Errs from post validations:`, { serrs, tmpPost, tmpPERR, });
     },
+    /*
+      let usrs = await User.find({
+      relations: {
+        contents: true,
+      },
+    },
+    );
+    */
     async tstUsr() {
         let ds = await getToDataSource({ entities: [User, Post] });
-        let usrs = await User.newQueryBuilder().getMany();
+        //let usrs = await User.newQueryBuilder().getMany();
+        let usrs = await User.find({
+            relations: {
+                posts: true,
+            },
+            /*
+          */
+        });
         let usr = usrs[0];
+        //let uds = (usr.constructor as any).getRepository().manager.connection.metadata;
+        let uds = usr.constructor.getRepository().metadata;
+        //await usr.loadRelation('posts');
         let usrProps = getProps(usr, true);
-        console.log({ usr, usrProps });
+        console.log({ usr, usrProps, });
         /*
         let usrsJ = JSON.stringify(usrs,null,2);
         let usrsP = JSON.parse(usrsJ);
