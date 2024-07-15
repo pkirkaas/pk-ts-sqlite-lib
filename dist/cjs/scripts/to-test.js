@@ -98,14 +98,16 @@ let tfncs = {
     async tstUsr() {
         let ds = await getToDataSource({ entities: [User, Post] });
         //let usrs = await User.newQueryBuilder().getMany();
-        let usrs = await User.find({
-            relations: {
-                posts: true,
-            },
-            /*
-          */
-        });
-        let usr = usrs[0];
+        /*
+      let usrs = await User.find({
+      relations: {
+        posts: true,
+      },
+    },
+    );
+      let usr = usrs[0];
+      */
+        let usr = await User.findById(1);
         //let uds = (usr.constructor as any).getRepository().manager.connection.metadata;
         let uds = usr.constructor.getRepository().metadata;
         //await usr.loadRelation('posts');

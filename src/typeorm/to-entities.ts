@@ -35,6 +35,25 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 		// @ts-ignore
 		return this.getRepository().metadata.tableName;
 	}
+	
+	/** FindOneById() annoyingly deprecated by TypeOrm - re-implement
+	 * @param id - the id of the entity to find
+	 * @returns the entity found, or null if not found
+	 */
+
+	static findById<T extends BaseEntity>(
+        this: { new (): T } & typeof BaseEntity,
+        //this: { new (): T } & typeof <T>,
+        id: string | number | Date,
+    ): Promise<T | null> {
+		// @ts-ignore
+        return this.getRepository<T>().findOneBy({id});
+    }
+	/*
+	static findById(id:number):Promise<PkBaseEntity> {
+		return this.findOne({id});
+	}
+		*/
 
 	/**
 	 * A new query builder for this entity, without needing the table name 
@@ -87,10 +106,18 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 	}
 
 	// Try with options
+	/**
+	 * If an entity was loaded without relations but wants them later,
+	 * this method will load them into the current entity - with options
+	 * @param relationName - name of the relation
+	 * @param options?:GenObj - where conditions, limit, order, etc
+	 * TODO: Investigate how to specify relationships within the relationship
+	 */
 	  async loadRelation<T extends BaseEntity>(
 			this: T, 
 			relationName: string,
 			options: {
+				//NOT AT ALL SURE THIS IS CORRECT TYPE FOR where arg?
 				where?: ObjectLiteral | ((qb: WhereExpressionBuilder) => void),
 				order?: { [key: string]: 'ASC' | 'DESC' },
 				limit?: number,
@@ -104,7 +131,6 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
       throw new Error(`Relation ${relationName} not found in ${metadata.name}`);
     }
 
-    //const queryBuilder = (this as any).getConnection()
     const queryBuilder = (this.constructor as any).getRepository()
       .createQueryBuilder()
       .relation(metadata.target, relationName)
@@ -129,40 +155,12 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 			if (options.offset) {
 				queryBuilder.offset(options.offset);
 			}
-	
-	
-
     const relatedEntities = await queryBuilder.loadMany();
 
     (this as T)[relationName] = relation.isManyToOne ? relatedEntities[0] : relatedEntities;
 
     return this;
   }
-
-	/** Works - but about to try with options... */
-	/*
-	  async loadRelationNoOpts<T extends BaseEntity>(this: T, relationName: string): Promise<T> {
-    //const metadata = (this as any).getConnection().getMetadata(this.constructor);
-    const metadata = (this.constructor as any).getRepository().metadata;
-    const relation = metadata.findRelationWithPropertyPath(relationName);
-
-    if (!relation) {
-      throw new Error(`Relation ${relationName} not found in ${metadata.name}`);
-    }
-
-    //const queryBuilder = (this as any).getConnection()
-    const queryBuilder = (this.constructor as any).getRepository()
-      .createQueryBuilder()
-      .relation(metadata.target, relationName)
-      .of(this);
-
-    const relatedEntities = await queryBuilder.loadMany();
-
-    (this as T)[relationName] = relation.isManyToOne ? relatedEntities[0] : relatedEntities;
-
-    return this;
-  }
-		*/
 
 }
 

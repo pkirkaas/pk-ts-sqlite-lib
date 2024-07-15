@@ -30,6 +30,13 @@ export declare abstract class PkBaseEntity extends BaseEntity {
      * @returns string - table name of the entity
      */
     static getTableName(): string;
+    /** FindOneById() annoyingly deprecated by TypeOrm - re-implement
+     * @param id - the id of the entity to find
+     * @returns the entity found, or null if not found
+     */
+    static findById<T extends BaseEntity>(this: {
+        new (): T;
+    } & typeof BaseEntity, id: string | number | Date): Promise<T | null>;
     /**
      * A new query builder for this entity, without needing the table name
      * CAN USE JUST andWhere, don't need to start w. where
@@ -49,6 +56,13 @@ export declare abstract class PkBaseEntity extends BaseEntity {
      */
     static errors(data: any, vOpts?: ValidatorOptions, opts?: GenObj): Promise<any>;
     errors(vOpts?: ValidatorOptions, opts?: GenObj): Promise<false | import("class-validator").ValidationError[]>;
+    /**
+     * If an entity was loaded without relations but wants them later,
+     * this method will load them into the current entity - with options
+     * @param relationName - name of the relation
+     * @param options?:GenObj - where conditions, limit, order, etc
+     * TODO: Investigate how to specify relationships within the relationship
+     */
     loadRelation<T extends BaseEntity>(this: T, relationName: string, options?: {
         where?: ObjectLiteral | ((qb: WhereExpressionBuilder) => void);
         order?: {

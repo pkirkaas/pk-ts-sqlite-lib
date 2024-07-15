@@ -31,6 +31,21 @@ export class PkBaseEntity extends BaseEntity {
         // @ts-ignore
         return this.getRepository().metadata.tableName;
     }
+    /** FindOneById() annoyingly deprecated by TypeOrm - re-implement
+     * @param id - the id of the entity to find
+     * @returns the entity found, or null if not found
+     */
+    static findById(
+    //this: { new (): T } & typeof <T>,
+    id) {
+        // @ts-ignore
+        return this.getRepository().findOneBy({ id });
+    }
+    /*
+    static findById(id:number):Promise<PkBaseEntity> {
+        return this.findOne({id});
+    }
+        */
     /**
      * A new query builder for this entity, without needing the table name
      * CAN USE JUST andWhere, don't need to start w. where
@@ -81,13 +96,19 @@ export class PkBaseEntity extends BaseEntity {
         return false; // ?? what should success return?
     }
     // Try with options
+    /**
+     * If an entity was loaded without relations but wants them later,
+     * this method will load them into the current entity - with options
+     * @param relationName - name of the relation
+     * @param options?:GenObj - where conditions, limit, order, etc
+     * TODO: Investigate how to specify relationships within the relationship
+     */
     async loadRelation(relationName, options = {}) {
         const metadata = this.constructor.getRepository().metadata;
         const relation = metadata.findRelationWithPropertyPath(relationName);
         if (!relation) {
             throw new Error(`Relation ${relationName} not found in ${metadata.name}`);
         }
-        //const queryBuilder = (this as any).getConnection()
         const queryBuilder = this.constructor.getRepository()
             .createQueryBuilder()
             .relation(metadata.target, relationName)
