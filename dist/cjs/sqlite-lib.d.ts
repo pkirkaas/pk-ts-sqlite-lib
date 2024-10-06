@@ -15,8 +15,12 @@ export interface ColDef {
  * @param string|null filename
  * The absolute or relative (to invoking directory) path to the db file.
  * Creates if doesn't exist
+ * Adds the `filenname` property to the db object.
  */
 export declare function openDb(filename?: string): Promise<import("sqlite").Database<sqlite3.Database, sqlite3.Statement>>;
+export declare function insertRow(db: any, tblName: any, row: any): Promise<void>;
+export declare function getOne(db: any, tblName: any, where: string, params?: any): Promise<any>;
+export declare function getAll(db: any, tblName: any, where: string, params?: any): Promise<any>;
 /**
  * create table in DB if not exists - create id by default
  */

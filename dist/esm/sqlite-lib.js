@@ -5,6 +5,7 @@
 import { isEmpty, isObject, slashPath, PkError, } from './index.js';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import fs from "fs-extra";
 import path from 'path';
 sqlite3.verbose();
 ;
@@ -15,6 +16,7 @@ sqlite3.verbose();
  * @param string|null filename
  * The absolute or relative (to invoking directory) path to the db file.
  * Creates if doesn't exist
+ * Adds the `filenname` property to the db object.
  */
 export async function openDb(filename) {
     if (!filename) {
@@ -26,11 +28,49 @@ export async function openDb(filename) {
     if ((filename !== ':memory') && !path.isAbsolute(filename)) {
         filename = slashPath(process.cwd(), filename);
     }
-    console.log(`About to open [${filename}]`);
-    return open({
+    let dir = path.posix.dirname(filename);
+    let dires = fs.mkdirSync(dir, { recursive: true });
+    console.log(`About to open [${filename}] in dir [${dir}]`);
+    let db = await open({
         filename,
         driver: sqlite3.Database
     });
+    //@ts-ignore
+    db.filename = filename;
+    return db;
+}
+export async function insertRow(db, tblName, row) {
+    let cols = Object.keys(row);
+    let vals = Object.values(row);
+    let sql = `INSERT INTO ${tblName} (${cols.join(',')}) VALUES (${vals.map(() => '?').join(',')})`;
+    let stmt = await db.prepare(sql);
+    await stmt.run(vals);
+    await stmt.finalize();
+}
+/*
+TODO: queries - parameterize objects - to "where" and "params" - like
+
+obj: {key:value} to:
+  where: `${key} = :${key}`
+    params: {`:${key}` <comparitor> :value}
+
+    Then:
+    let res = await db.get(sql, params); // For single row
+    let res = await db.all(sql, params); // For multiple rows
+
+    const result = await db.get('SELECT col FROM tbl WHERE col = :test', {
+  ':test': 'test'
+});
+*/
+export async function getOne(db, tblName, where, params = {}) {
+    let sql = `SELECT * FROM ${tblName} WHERE ${where}`;
+    let res = await db.get(sql, params);
+    return res;
+}
+export async function getAll(db, tblName, where, params = {}) {
+    let sql = `SELECT * FROM ${tblName} WHERE ${where}`;
+    let res = await db.all(sql, params);
+    return res;
 }
 /**
  * create table in DB if not exists - create id by default
@@ -99,10 +139,12 @@ export async function getSqliteTables(dbName) {
 }
 export async function emptySqliteTable(tblName, dbName) {
     let db = await openDb(dbName);
+    //@ts-ignore
+    let dbPath = db.filename;
     let tbls = await getSqliteTables(dbName);
     if (!tbls.includes(tblName)) {
         console.error(`Table ${tblName} not found in ${dbName} - Tables:`, tbls);
-        throw new PkError(`Table ${tblName} not found in ${dbName}`);
+        throw new PkError(`Table ${tblName} not found in ${dbPath}`);
     }
     let delStr = `DELETE FROM '${tblName}';`;
     let res = await db.exec(delStr);
