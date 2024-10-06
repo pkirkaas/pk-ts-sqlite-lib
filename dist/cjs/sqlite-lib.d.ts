@@ -25,7 +25,8 @@ export declare function tableExists(db: any, tblName: any): Promise<unknown>;
 /** system tables */
 export declare const sqlite_systables: string[];
 /** Return all table names */
-export declare function getSqliteTables(dbName?: string): Promise<any[]>;
+export declare function getSqliteTables(dbName?: string): Promise<string[]>;
+export declare function emptySqliteTable(tblName: any, dbName?: string): Promise<void>;
 /**
  * JUST FOR DEV - DANGEROUS!
  */

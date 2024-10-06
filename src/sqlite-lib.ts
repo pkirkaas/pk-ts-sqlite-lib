@@ -86,7 +86,9 @@ export const sqlite_systables = [
 	'sqlite_sequence',
 ];
 /** Return all table names */
-export async function getSqliteTables(dbName?:string) {
+export async function getSqliteTables(dbName?:string):Promise<string[]> {
+
+	/*
 	if (!dbName) {
 		dbName = process.env.SQLITE_DB;
 	}
@@ -96,6 +98,7 @@ export async function getSqliteTables(dbName?:string) {
 	if ((dbName !== ':memory') && !path.isAbsolute(dbName)) {
 		dbName = slashPath(process.cwd(), dbName);
 	}
+		*/
 	let db = await openDb(dbName);
 	// Confirm which to query for tables  'sqlite_schema',  'sqlite_sequence' 'sqlite_master', 
 	let teStr2 = `  SELECT * FROM 'sqlite_master' WHERE type='table' `;
@@ -110,11 +113,23 @@ export async function getSqliteTables(dbName?:string) {
 	return tNames;
 }
 
+export async function emptySqliteTable(tblName, dbName?: string) {
+	let db = await openDb(dbName);
+	let tbls = await getSqliteTables(dbName);
+	if (!tbls.includes(tblName)) {
+		console.error(`Table ${tblName} not found in ${dbName} - Tables:`, tbls);
+		throw new PkError(`Table ${tblName} not found in ${dbName}`);
+	}
+	let delStr = `DELETE FROM '${tblName}';`;
+	let res = await db.exec(delStr);
+	return res;
+}
 
 /**
  * JUST FOR DEV - DANGEROUS! 
  */
 export async function emptySqliteTables(dbName?: string) {
+	/*
 	if (!dbName) {
 		dbName = process.env.SQLITE_DB;
 	}
@@ -124,6 +139,7 @@ export async function emptySqliteTables(dbName?: string) {
 	if ((dbName !== ':memory') && !path.isAbsolute(dbName)) {
 		dbName = slashPath(process.cwd(), dbName);
 	}
+		*/
 	let db = await openDb(dbName);
 	let tbls = await getSqliteTables(dbName);
 	for (let tblName of tbls) {
