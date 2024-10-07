@@ -20,6 +20,12 @@ export declare let AppDataSource: any;
 export declare let sqliteToConfig: DataSourceOptions;
 export declare let mySqlToConfig: DataSourceOptions;
 export declare let postgresToConfig: DataSourceOptions;
+export declare const toDbConfigs: {
+    postgres: import("typeorm/driver/postgres/PostgresConnectionOptions.js").PostgresConnectionOptions;
+    mysql: import("typeorm/driver/mysql/MysqlConnectionOptions.js").MysqlConnectionOptions;
+    sqlite: import("typeorm/driver/sqlite/SqliteConnectionOptions.js").SqliteConnectionOptions;
+};
+export declare function getToConfig(type?: string, custom?: GenObj): any;
 /**
  * Returns an entity class from a string|Entity object of entites - {User, Post, ...}
  * @param entity string|Entity - if string, key to entity class in entities
@@ -30,10 +36,11 @@ export declare function getEntity(entity: string | typeof Entity, src?: any): st
 export declare let defaultToConfig: DataSourceOptions;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
+ * CHANGE: 8 Oct 24 - no global AppDataSource - to support multiple connections
  * @param ToConfig
  * @returns connected ToDataSource
  */
-export declare function getToDataSource(ToConfig?: GenObj): Promise<any>;
+export declare function getToDataSource(ToConfig?: GenObj, type?: string): Promise<any>;
 /**
  * Deletes/empties all given entities/tables
  * @param entities - array of entities to delete/empty

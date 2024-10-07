@@ -12,8 +12,7 @@ import "reflect-metadata";
 export * from './to-entities.js';
 //import "reflect-metadata";
 import { isSubclassOf, isObject, firstToUpper, } from 'pk-ts-common-lib';
-import { typeOf, PkError, slashPath } from './index.js';
-import fs from "fs-extra";
+import { typeOf, PkError, slashPath, mkDirForPath, } from './index.js';
 import path from 'path';
 //import { PkBaseEntity } from './to-entities.js';
 import { DataSource, BaseEntity, } from "typeorm";
@@ -61,6 +60,15 @@ export let postgresToConfig = {
     database: process.env.PG_DB,
     synchronize: true,
 };
+export const toDbConfigs = {
+    postgres: postgresToConfig,
+    mysql: mySqlToConfig,
+    sqlite: sqliteToConfig,
+};
+export function getToConfig(type = 'sqlite', custom = {}) {
+    let config = { ...toDbConfigs[type], ...custom };
+    return config;
+}
 /**
  * Returns an entity class from a string|Entity object of entites - {User, Post, ...}
  * @param entity string|Entity - if string, key to entity class in entities
@@ -94,30 +102,41 @@ export function getEntity(entity, src) {
 export let defaultToConfig = postgresToConfig;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
+ * CHANGE: 8 Oct 24 - no global AppDataSource - to support multiple connections
  * @param ToConfig
  * @returns connected ToDataSource
  */
-export async function getToDataSource(ToConfig = {}) {
-    let config = { ...defaultToConfig, ...ToConfig };
-    if (AppDataSource === null) {
-        if (config.type === 'sqlite') {
-            let filename = config.database;
-            if (filename !== ":memory") {
-                if (!path.isAbsolute(filename)) {
-                    filename = slashPath(process.cwd(), filename);
-                }
-                let dir = path.posix.dirname(filename);
-                let dires = fs.mkdirSync(dir, { recursive: true });
+export async function getToDataSource(ToConfig = {}, type = 'sqlite') {
+    //let config: DataSourceOptions = { ...defaultToConfig, ...ToConfig };
+    let config = getToConfig(type, ToConfig);
+    let ds;
+    //if (AppDataSource === null) {
+    if (config.type === 'sqlite') {
+        let filename = config.database;
+        if (filename !== ":memory") {
+            if (!path.isAbsolute(filename)) {
+                filename = slashPath(process.cwd(), filename);
             }
+            mkDirForPath(filename);
+            //let dir = path.posix.dirname(filename);
+            //let dires = fs.mkdirSync(dir, { recursive: true });
         }
-        //console.log(`Trying to initialze DA w.`, {config});
-        AppDataSource = new PkDataSource(config);
-        await AppDataSource.initialize();
     }
-    if (!AppDataSource.isInitialized) {
+    //console.log(`Trying to initialze DA w.`, {config});
+    //AppDataSource = new PkDataSource(config);
+    ds = new PkDataSource(config);
+    //await AppDataSource.initialize();
+    //if (!AppDataSource.isInitialized) {
+    if (!ds.isInitialized) {
+        await ds.initialize();
+    }
+    //  }
+    //if (!AppDataSource.isInitialized) {
+    if (!ds.isInitialized) {
         throw new PkError("TO DataSource not initialized, w. config:", { config });
     }
-    return AppDataSource;
+    AppDataSource = ds;
+    return ds;
 }
 /**
  * Deletes/empties all given entities/tables

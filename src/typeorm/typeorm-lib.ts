@@ -16,7 +16,7 @@ export * from './to-entities.js';
 
 import { isSubclassOf, isObject, typeOfEach, firstToUpper, } from 'pk-ts-common-lib';
 
-import { GenObj, typeOf, isEmpty, PkError, slashPath } from './index.js';
+import { GenObj, typeOf, isEmpty, PkError, slashPath, mkDirForPath, } from './index.js';
 import fs from "fs-extra";
 import path from 'path';
 
@@ -71,8 +71,18 @@ export let postgresToConfig: DataSourceOptions = {
   password: process.env.PG_PWD,
   database: process.env.PG_DB,
   synchronize: true,
-
 };
+
+export const toDbConfigs = {
+  postgres: postgresToConfig,
+  mysql: mySqlToConfig,
+  sqlite: sqliteToConfig,
+};
+
+export function getToConfig(type: string = 'sqlite', custom: GenObj = {}) {
+  let config = {...toDbConfigs[type], ...custom };
+  return config;
+}
 
 /**
  * Returns an entity class from a string|Entity object of entites - {User, Post, ...}
@@ -106,33 +116,42 @@ export function getEntity(entity: string | typeof Entity, src?: any) {
 export let defaultToConfig: DataSourceOptions = postgresToConfig;
 /**
  * Initializes TO DB connection - provides default config that can be overridden by ToConfig arg
+ * CHANGE: 8 Oct 24 - no global AppDataSource - to support multiple connections
  * @param ToConfig 
  * @returns connected ToDataSource
  */
-export async function getToDataSource(ToConfig: GenObj = {}) {
-
-  let config: DataSourceOptions = { ...defaultToConfig, ...ToConfig };
-  if (AppDataSource === null) {
+export async function getToDataSource(ToConfig: GenObj = {}, type: string = 'sqlite') {
+  //let config: DataSourceOptions = { ...defaultToConfig, ...ToConfig };
+  let config: DataSourceOptions = getToConfig(type, ToConfig);
+  let ds;
+  //if (AppDataSource === null) {
     if (config.type === 'sqlite') {
       let filename = config.database;
       if (filename !== ":memory") {
         if (!path.isAbsolute(filename)) {
           filename = slashPath(process.cwd(), filename);
         }
-        let dir = path.posix.dirname(filename);
-        let dires = fs.mkdirSync(dir, { recursive: true });
+        mkDirForPath(filename);
+        //let dir = path.posix.dirname(filename);
+        //let dires = fs.mkdirSync(dir, { recursive: true });
       }
     }
 
     //console.log(`Trying to initialze DA w.`, {config});
-    AppDataSource = new PkDataSource(config);
-    await AppDataSource.initialize();
-  }
-  if (!AppDataSource.isInitialized) {
+    //AppDataSource = new PkDataSource(config);
+    ds = new PkDataSource(config);
+    //await AppDataSource.initialize();
+    //if (!AppDataSource.isInitialized) {
+    if (!ds.isInitialized) {
+      await ds.initialize();
+    }
+//  }
+  //if (!AppDataSource.isInitialized) {
+  if (!ds.isInitialized) {
     throw new PkError("TO DataSource not initialized, w. config:", { config });
   }
-
-  return AppDataSource;
+  AppDataSource = ds;
+  return ds;
 }
 
 /**
