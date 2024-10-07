@@ -1,6 +1,6 @@
 /**
- * New index for the typeorm sub-package
- * This is moving more towards Postgres because of more JSON functionality and Geolocattion support
+ * Enhancements for typeorm sub-package
+ * Moving more towards Postgres because of more JSON functionality and Geolocation support
  */
 import "reflect-metadata";
 export * from '../init.js';

@@ -1,14 +1,20 @@
 /**
  * TypeORM library convenient functions
- */
-/**
+ * Assumes PkBaseEntity
  * Every app using this should export an entities object: export const entities = {User, Post, Comment,...}
+ *
+ * Exports:
+ * class PkDataSource (extends TypeOrm DataSource)
+ * functions:
+ *   getToDataSource - Takes initialization params & returns PkDataSource instance
  */
 import "reflect-metadata";
 export * from './to-entities.js';
 //import "reflect-metadata";
-import { isSubclassOf, isObject, firstToUpper } from 'pk-ts-common-lib';
-import { typeOf, PkError, } from './index.js';
+import { isSubclassOf, isObject, firstToUpper, } from 'pk-ts-common-lib';
+import { typeOf, PkError, slashPath } from './index.js';
+import fs from "fs-extra";
+import path from 'path';
 //import { PkBaseEntity } from './to-entities.js';
 import { DataSource, BaseEntity, } from "typeorm";
 export class PkDataSource extends DataSource {
@@ -94,6 +100,16 @@ export let defaultToConfig = postgresToConfig;
 export async function getToDataSource(ToConfig = {}) {
     let config = { ...defaultToConfig, ...ToConfig };
     if (AppDataSource === null) {
+        if (config.type === 'sqlite') {
+            let filename = config.database;
+            if (filename !== ":memory") {
+                if (!path.isAbsolute(filename)) {
+                    filename = slashPath(process.cwd(), filename);
+                }
+                let dir = path.posix.dirname(filename);
+                let dires = fs.mkdirSync(dir, { recursive: true });
+            }
+        }
         //console.log(`Trying to initialze DA w.`, {config});
         AppDataSource = new PkDataSource(config);
         await AppDataSource.initialize();

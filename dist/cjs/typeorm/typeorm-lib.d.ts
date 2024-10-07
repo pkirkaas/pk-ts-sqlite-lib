@@ -1,8 +1,12 @@
 /**
  * TypeORM library convenient functions
- */
-/**
+ * Assumes PkBaseEntity
  * Every app using this should export an entities object: export const entities = {User, Post, Comment,...}
+ *
+ * Exports:
+ * class PkDataSource (extends TypeOrm DataSource)
+ * functions:
+ *   getToDataSource - Takes initialization params & returns PkDataSource instance
  */
 import "reflect-metadata";
 export * from './to-entities.js';

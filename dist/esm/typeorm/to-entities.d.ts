@@ -1,5 +1,13 @@
 /**
  * Building a library of enhanced TypeORM Entities
+ * Exports:
+ * PkBaseEntity: Extends TypeOrm BaseEntity with columns:
+ *   automatic ID, CreateDate, UpdateDate, DeleteDate, and JSON edata column
+ * Methods: findById, newQueryBuilder, loadRelations, & errors validation methods
+ *
+ * PkBaseUser: Adds email, name, etc to PkBaseEntity
+ *
+ * Location: Implements location functionality
  */
 import "reflect-metadata";
 import { ObjectLiteral, WhereExpressionBuilder, BaseEntity, Point } from "typeorm";

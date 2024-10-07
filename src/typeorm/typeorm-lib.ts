@@ -1,9 +1,12 @@
 /**
  * TypeORM library convenient functions
- */
-
-/**
+ * Assumes PkBaseEntity 
  * Every app using this should export an entities object: export const entities = {User, Post, Comment,...}
+ * 
+ * Exports: 
+ * class PkDataSource (extends TypeOrm DataSource)
+ * functions:
+ *   getToDataSource - Takes initialization params & returns PkDataSource instance
  */
 
 import "reflect-metadata";
@@ -11,9 +14,11 @@ export * from './to-entities.js';
 
 //import "reflect-metadata";
 
-import { isSubclassOf, isObject, typeOfEach, firstToUpper } from 'pk-ts-common-lib';
+import { isSubclassOf, isObject, typeOfEach, firstToUpper, } from 'pk-ts-common-lib';
 
-import { GenObj, typeOf, isEmpty, PkError, } from './index.js';
+import { GenObj, typeOf, isEmpty, PkError, slashPath } from './index.js';
+import fs from "fs-extra";
+import path from 'path';
 
 //import { PkBaseEntity } from './to-entities.js';
 
@@ -56,7 +61,7 @@ export let mySqlToConfig: DataSourceOptions = {
   password: '', //process.env.MYSQL_PWD,
   database: process.env.MYSQL_DB,
   synchronize: true,
-}
+};
 
 export let postgresToConfig: DataSourceOptions = {
   type: "postgres",
@@ -67,7 +72,7 @@ export let postgresToConfig: DataSourceOptions = {
   database: process.env.PG_DB,
   synchronize: true,
 
-}
+};
 
 /**
  * Returns an entity class from a string|Entity object of entites - {User, Post, ...}
@@ -105,8 +110,20 @@ export let defaultToConfig: DataSourceOptions = postgresToConfig;
  * @returns connected ToDataSource
  */
 export async function getToDataSource(ToConfig: GenObj = {}) {
+
   let config: DataSourceOptions = { ...defaultToConfig, ...ToConfig };
   if (AppDataSource === null) {
+    if (config.type === 'sqlite') {
+      let filename = config.database;
+      if (filename !== ":memory") {
+        if (!path.isAbsolute(filename)) {
+          filename = slashPath(process.cwd(), filename);
+        }
+        let dir = path.posix.dirname(filename);
+        let dires = fs.mkdirSync(dir, { recursive: true });
+      }
+    }
+
     //console.log(`Trying to initialze DA w.`, {config});
     AppDataSource = new PkDataSource(config);
     await AppDataSource.initialize();
@@ -148,7 +165,7 @@ export async function clearEntities(entities: any[], dataSource: any = null) {
       }
       results.push(result);
     } catch (e) {
-      console.error(`OH - caught an exception!`,{e});
+      console.error(`OH - caught an exception!`, { e });
     }
   }
   await dataSource.query("PRAGMA foreign_keys = ON;");
@@ -165,7 +182,7 @@ export function mkPoint(src: GenObj): Point {
   let point: Point = {
     type: "Point",
     coordinates: [src.lon, src.lat],
-  }
+  };
   return point;
 }
 
