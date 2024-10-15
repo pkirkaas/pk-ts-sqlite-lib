@@ -8,15 +8,58 @@
  * functions:
  *   getToDataSource - Takes initialization params & returns PkDataSource instance
  */
+// NPM Imports
 import "reflect-metadata";
-export * from './to-entities.js';
-//import "reflect-metadata";
-import { isSubclassOf, isObject, firstToUpper, } from 'pk-ts-common-lib';
-import { typeOf, PkError, slashPath, mkDirForPath, } from './index.js';
 import path from 'path';
-//import { PkBaseEntity } from './to-entities.js';
 import { DataSource, BaseEntity, } from "typeorm";
+// PK Lib imports
+import { isSubclassOf, isObject, firstToUpper, typeOf, PkError, slashPath, mkDirForPath, } from 'pk-ts-node-lib';
+//import { GenObj, typeOf, isEmpty, PkError, slashPath, mkDirForPath, } from './index.js';
+//import { PkBaseEntity } from './to-entities.js';
+export * from './to-entities.js';
 export class PkDataSource extends DataSource {
+    static DataSources = {};
+    static mkDbId(opts) {
+        let dbId = opts.type;
+        if (opts.type === 'mysql') {
+            dbId += ':' + path.resolve(opts.database);
+        }
+        else {
+            dbId += ':' + opts.port + ':' + opts.host + ':' + opts.database;
+        }
+        return dbId;
+    }
+    static async getToDataSource(ToConfig = {}, type = 'sqlite') {
+        let config = getToConfig(type, ToConfig);
+        let dbId = this.mkDbId(config);
+        if (this.DataSources[dbId]) {
+            return this.DataSources[dbId];
+        }
+        if (config.type === 'sqlite') {
+            let filename = config.database;
+            if (filename !== ":memory") {
+                mkDirForPath(path.resolve(filename));
+            }
+        }
+        let ds = new PkDataSource(config);
+        if (!ds.isInitialized) {
+            await ds.initialize();
+        }
+        if (!ds.isInitialized) {
+            throw new PkError("TO DataSource not initialized, w. config:", { config });
+        }
+        return ds;
+    }
+    dbId;
+    constructor(config) {
+        //@ts-ignore
+        super(config);
+        //@ts-ignore
+        let dbId = this.constructor.mkDbId(config);
+        this.dbId = dbId;
+        //@ts-ignore
+        this.constructor.DataSources[dbId] = this;
+    }
     getEntities() {
         let entities = this.options.entities;
         return entities;
@@ -46,8 +89,8 @@ export let mySqlToConfig = {
     type: "mysql",
     host: process.env.MYSQL_HOST || 'localhost',
     port: 3306,
-    username: 'root', //process.env.MYSQL_USER,
-    password: '', //process.env.MYSQL_PWD,
+    username: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PWD || '',
     database: process.env.MYSQL_DB,
     synchronize: true,
 };
@@ -106,6 +149,9 @@ export let defaultToConfig = postgresToConfig;
  * @param ToConfig
  * @returns connected ToDataSource
  */
+/**
+ * @Deprecated - use static PkDataSource.getToDataSource instead
+ */
 export async function getToDataSource(ToConfig = {}, type = 'sqlite') {
     //let config: DataSourceOptions = { ...defaultToConfig, ...ToConfig };
     let config = getToConfig(type, ToConfig);
@@ -118,24 +164,16 @@ export async function getToDataSource(ToConfig = {}, type = 'sqlite') {
                 filename = slashPath(process.cwd(), filename);
             }
             mkDirForPath(filename);
-            //let dir = path.posix.dirname(filename);
-            //let dires = fs.mkdirSync(dir, { recursive: true });
         }
     }
-    //console.log(`Trying to initialze DA w.`, {config});
-    //AppDataSource = new PkDataSource(config);
     ds = new PkDataSource(config);
-    //await AppDataSource.initialize();
-    //if (!AppDataSource.isInitialized) {
     if (!ds.isInitialized) {
         await ds.initialize();
     }
-    //  }
-    //if (!AppDataSource.isInitialized) {
     if (!ds.isInitialized) {
         throw new PkError("TO DataSource not initialized, w. config:", { config });
     }
-    AppDataSource = ds;
+    //AppDataSource = ds;
     return ds;
 }
 /**

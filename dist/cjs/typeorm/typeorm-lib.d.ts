@@ -9,10 +9,15 @@
  *   getToDataSource - Takes initialization params & returns PkDataSource instance
  */
 import "reflect-metadata";
-export * from './to-entities.js';
-import { GenObj } from './index.js';
 import { Entity, DataSource, BaseEntity, DataSourceOptions, Point } from "typeorm";
+import { GenObj } from 'pk-ts-node-lib';
+export * from './to-entities.js';
 export declare class PkDataSource extends DataSource {
+    static DataSources: GenObj;
+    static mkDbId(opts: GenObj): string;
+    static getToDataSource(ToConfig?: GenObj, type?: string): Promise<any>;
+    dbId: string;
+    constructor(config: any);
     getEntities(): GenObj;
     getEntity(entity: any): BaseEntity | null | boolean;
 }
@@ -39,6 +44,9 @@ export declare let defaultToConfig: DataSourceOptions;
  * CHANGE: 8 Oct 24 - no global AppDataSource - to support multiple connections
  * @param ToConfig
  * @returns connected ToDataSource
+ */
+/**
+ * @Deprecated - use static PkDataSource.getToDataSource instead
  */
 export declare function getToDataSource(ToConfig?: GenObj, type?: string): Promise<any>;
 /**
