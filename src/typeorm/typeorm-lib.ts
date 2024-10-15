@@ -40,8 +40,24 @@ export class PkDataSource extends DataSource {
     }
     return dbId;
   }
-  static async getToDataSource(ToConfig: GenObj = {}, type: string = 'sqlite') {
-    let config: DataSourceOptions = getToConfig(type, ToConfig);
+  //static async getToDataSource(ToConfig: GenObj = {type:defaultType,}, ) {
+  /**
+   * Static Factory for PkDataSource
+   * @param ToConfig - GenObj PkDataSource config, PkDataSource instance, or string DataSource type, or empty for default
+   */
+  static async getToDataSource(ToConfig:any = defaultType, ) {
+    if (ToConfig instanceof this) {
+      return ToConfig;
+    } else if (typeof ToConfig === 'string') {
+      ToConfig = {type:ToConfig};
+    }
+    if (!isObject(ToConfig)) {
+      throw new PkError(`Invalid type of ToConfig:`,{ToConfig});
+    }
+    if (!ToConfig.type) {
+      ToConfig.type = defaultType;
+    }
+    let config: DataSourceOptions = getToConfig(ToConfig);
     let dbId = this.mkDbId(config);
     if (this.DataSources[dbId]) {
       return this.DataSources[dbId];
@@ -128,7 +144,15 @@ export const toDbConfigs = {
   sqlite: sqliteToConfig,
 };
 
-export function getToConfig(type: string = 'sqlite', custom: GenObj = {}) {
+/**
+ * The default TypeOrm DB type - in .env or default 'sqlite'
+ */
+export const defaultType  = process.env.TO_DBTYPE || 'sqlite';
+export function getToConfig(custom: GenObj = {type:defaultType}) {
+  let type = custom.type || defaultType;
+  if (! (type in toDbConfigs)) {
+    throw new PkError(`Invalid DB Type : [${type}]`);
+  }
   let config = {...toDbConfigs[type], ...custom };
   return config;
 }
@@ -173,9 +197,12 @@ export let defaultToConfig: DataSourceOptions = postgresToConfig;
 /**
  * @Deprecated - use static PkDataSource.getToDataSource instead
  */
-export async function getToDataSource(ToConfig: GenObj = {}, type: string = 'sqlite') {
+export async function getToDataSource(ToConfig: GenObj = {type:defaultType}, type: string = defaultType) {
+  if (!ToConfig.type) {
+    ToConfig.type = defaultType;
+  }
   //let config: DataSourceOptions = { ...defaultToConfig, ...ToConfig };
-  let config: DataSourceOptions = getToConfig(type, ToConfig);
+  let config: DataSourceOptions = getToConfig(ToConfig);
   let ds;
   //if (AppDataSource === null) {
     if (config.type === 'sqlite') {

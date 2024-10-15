@@ -15,7 +15,11 @@ export * from './to-entities.js';
 export declare class PkDataSource extends DataSource {
     static DataSources: GenObj;
     static mkDbId(opts: GenObj): string;
-    static getToDataSource(ToConfig?: GenObj, type?: string): Promise<any>;
+    /**
+     * Static Factory for PkDataSource
+     * @param ToConfig - GenObj PkDataSource config, PkDataSource instance, or string DataSource type, or empty for default
+     */
+    static getToDataSource(ToConfig?: any): Promise<any>;
     dbId: string;
     constructor(config: any);
     getEntities(): GenObj;
@@ -30,7 +34,11 @@ export declare const toDbConfigs: {
     mysql: import("typeorm/driver/mysql/MysqlConnectionOptions.js").MysqlConnectionOptions;
     sqlite: import("typeorm/driver/sqlite/SqliteConnectionOptions.js").SqliteConnectionOptions;
 };
-export declare function getToConfig(type?: string, custom?: GenObj): any;
+/**
+ * The default TypeOrm DB type - in .env or default 'sqlite'
+ */
+export declare const defaultType: string;
+export declare function getToConfig(custom?: GenObj): any;
 /**
  * Returns an entity class from a string|Entity object of entites - {User, Post, ...}
  * @param entity string|Entity - if string, key to entity class in entities
