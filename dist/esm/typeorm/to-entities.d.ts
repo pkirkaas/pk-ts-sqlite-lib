@@ -84,6 +84,9 @@ export declare abstract class PkBaseUser extends PkBaseEntity {
     email: string;
     name: string;
     pwd: string;
+    google_id: string;
+    facebook_id: string;
+    github_id: string;
     udata: any;
     virtc(): void;
     get namemail(): string;

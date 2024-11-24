@@ -167,6 +167,9 @@ export class PkBaseUser extends PkBaseEntity {
     email;
     name;
     pwd;
+    google_id;
+    facebook_id;
+    github_id;
     udata;
     // @ts-ignore
     virtc() { this.virtne = `NAMEEMAIL: ${this.email} ${this.name}`; }
@@ -187,6 +190,18 @@ __decorate([
     Column({ nullable: true }),
     __metadata("design:type", String)
 ], PkBaseUser.prototype, "pwd", void 0);
+__decorate([
+    Column({ nullable: true }),
+    __metadata("design:type", String)
+], PkBaseUser.prototype, "google_id", void 0);
+__decorate([
+    Column({ nullable: true }),
+    __metadata("design:type", String)
+], PkBaseUser.prototype, "facebook_id", void 0);
+__decorate([
+    Column({ nullable: true }),
+    __metadata("design:type", String)
+], PkBaseUser.prototype, "github_id", void 0);
 __decorate([
     Column({ nullable: true, type: "json" }),
     __metadata("design:type", Object)

@@ -177,6 +177,9 @@ export abstract class PkBaseUser extends PkBaseEntity {
 	@Column({ nullable: true, unique: true, }) @IsEmail() email: string;
 	@Column({nullable: true, default:"Default Name"}) name: string;
 	@Column({ nullable: true }) pwd: string;
+	@Column({ nullable: true }) google_id: string;
+	@Column({ nullable: true }) facebook_id: string;
+	@Column({ nullable: true }) github_id: string;
 	@Column({nullable:true, type:"json"}) udata;
 	// @ts-ignore
 	@AfterLoad() virtc() { this.virtne =  `NAMEEMAIL: ${this.email} ${this.name}`; }
