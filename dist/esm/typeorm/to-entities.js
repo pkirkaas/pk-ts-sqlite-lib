@@ -103,6 +103,9 @@ export class PkBaseEntity extends BaseEntity {
         }
         return false; // ?? what should success return?
     }
+    /**
+     * GETTER to  get the entity class as a GenObj, to get the class of the instance to access static properties & methods from an instance
+     */
     get class() {
         return this.constructor;
         ;

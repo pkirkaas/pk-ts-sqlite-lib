@@ -113,6 +113,9 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 		return false; // ?? what should success return?
 	}
 
+	/**
+	 * GETTER to  get the entity class as a GenObj, to get the class of the instance to access static properties & methods from an instance
+	 */
 	get class():GenObj {
 		return this.constructor as GenObj;;
 	}

@@ -64,6 +64,9 @@ export declare abstract class PkBaseEntity extends BaseEntity {
      */
     static errors(data: any, vOpts?: ValidatorOptions, opts?: GenObj): Promise<any>;
     errors(vOpts?: ValidatorOptions, opts?: GenObj): Promise<false | import("class-validator").ValidationError[]>;
+    /**
+     * GETTER to  get the entity class as a GenObj, to get the class of the instance to access static properties & methods from an instance
+     */
     get class(): GenObj;
     /**
      * If an entity was loaded without relations but wants them later,
