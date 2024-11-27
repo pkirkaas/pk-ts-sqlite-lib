@@ -113,6 +113,10 @@ export abstract class PkBaseEntity extends BaseEntity { //All entities should ex
 		return false; // ?? what should success return?
 	}
 
+	get class():GenObj {
+		return this.constructor as GenObj;;
+	}
+
 	// Try with options
 	/**
 	 * If an entity was loaded without relations but wants them later,

@@ -103,6 +103,10 @@ export class PkBaseEntity extends BaseEntity {
         }
         return false; // ?? what should success return?
     }
+    get class() {
+        return this.constructor;
+        ;
+    }
     // Try with options
     /**
      * If an entity was loaded without relations but wants them later,
