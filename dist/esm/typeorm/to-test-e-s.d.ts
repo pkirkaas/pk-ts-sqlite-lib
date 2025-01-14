@@ -31,7 +31,7 @@ export declare class Post extends PkBaseEntity {
     content: string;
     user?: Relation<User>;
 }
-export declare function mkPlaceData(state?: string): GenObj;
+export declare function mkPlaceData(state?: string): import("node_modules/pk-ts-common-lib/dist/esm/common-operations.js").GenericObject;
 export declare function mkPlaces(cnt?: number): Promise<void>;
 export declare function mkUsers(cnt?: number): Promise<void>;
 export declare function mkUserData(cnt?: number): any[];

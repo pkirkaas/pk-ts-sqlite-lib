@@ -8,8 +8,8 @@ import {runCli, resetToDataSource, getToDataSource, PkBaseEntity,
 
   
   import {
-    saveData, objInspect, stackParse, dbgWrite,dbgWrt, utilInspect,
-    writeData, writeFile, 
+    saveData, objInspect, stackParse, dbgWrt, utilInspect,
+    writeData,  
   } from 'pk-ts-node-lib';
 
 import {
